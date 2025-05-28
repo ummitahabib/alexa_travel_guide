@@ -69992,7 +69992,7 @@ g.toString
 return A.yU(A.br(A.a([q,o,n,m,l,k,r.mR("past",A.br(A.a([j,i,h,r.a0R(g)],p),B.y,B.a8)),r.mR("getInTouch",A.aFP(a)),A.ab(s,50,s),r.a0P()],p),B.y,B.w),r.d,s,B.av)},
 $S:144}
 A.adh.prototype={
-$0(){return A.eB(A.cL("https://shetravel.com/apply",0,null),B.aD)},
+$0(){return A.eB(A.cL("https://instagram.com/invisible_guide",0,null),B.aD)},
 $S:0}
 A.adi.prototype={
 $0(){var s,r=this.a.c
@@ -70013,7 +70013,7 @@ $S:446}
 A.adl.prototype={
 $0(){var s=0,r=A.T(t.H),q
 var $async$$0=A.P(function(a,b){if(a===1)return A.Q(b,r)
-while(true)switch(s){case 0:q=A.cL("https://instagram.com/_u/shetravel",0,null)
+while(true)switch(s){case 0:q=A.cL("https://instagram.com/_u/invisible_guide",0,null)
 s=5
 return A.V(A.ahJ(q),$async$$0)
 case 5:s=b?2:4
@@ -70027,16 +70027,16 @@ case 3:return A.R(null,r)}})
 return A.S($async$$0,r)},
 $S:20}
 A.adm.prototype={
-$0(){return A.eB(A.cL("https://shetravel.com/apply",0,null),B.aD)},
+$0(){return A.eB(A.cL("https://instagram.com/invisible_guide",0,null),B.aD)},
 $S:0}
 A.adc.prototype={
-$0(){return A.eB(A.cL("https://facebook.com/shetravel",0,null),B.aD)},
+$0(){return A.eB(A.cL("https://facebook.com/invisible_guide",0,null),B.aD)},
 $S:0}
 A.add.prototype={
-$0(){return A.eB(A.cL("https://instagram.com/shetravel",0,null),B.aD)},
+$0(){return A.eB(A.cL("https://instagram.com/invisible_guide",0,null),B.aD)},
 $S:0}
 A.ade.prototype={
-$0(){return A.eB(A.cL("https://instagram.com/shetravel",0,null),B.aD)},
+$0(){return A.eB(A.cL("https://email.com/invisible_guide",0,null),B.aD)},
 $S:0}
 A.adf.prototype={
 $0(){return A.eB(A.cL("https://wa.me/2348000000000",0,null),B.aD)},

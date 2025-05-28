@@ -701,8 +701,8 @@ class _LandingPageWebState extends State<LandingPageWeb> {
           runSpacing: 12,
           alignment: WrapAlignment.center,
           children: [
-            _applyButton("Website", "https://shetravel.com/apply"),
-            _applyButton("Instagram", "https://instagram.com/shetravel"),
+            _applyButton("Website", "https://instagram.com/invisible_guide"),
+            _applyButton("Instagram", "https://instagram.com/invisible_guide"),
             _applyButton("WhatsApp", "https://wa.me/1234567890"),
           ],
         ),

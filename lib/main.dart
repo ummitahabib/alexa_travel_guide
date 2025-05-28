@@ -240,7 +240,7 @@ class _LandingPageState extends State<LandingPage> {
                   GestureDetector(
                     onTap:
                         () =>
-                            launchUrl(Uri.parse("https://shetravel.com/apply")),
+                            launchUrl(Uri.parse("https://instagram.com/invisible_guide")),
                     child: Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: 30,
@@ -534,7 +534,7 @@ class _LandingPageState extends State<LandingPage> {
                 GestureDetector(
                   onTap: () async {
                     final Uri igUrl = Uri.parse(
-                      "https://instagram.com/_u/shetravel",
+                      "https://instagram.com/_u/invisible_guide",
                     );
                     if (await canLaunchUrl(igUrl)) {
                       await launchUrl(
@@ -566,7 +566,7 @@ class _LandingPageState extends State<LandingPage> {
                 ),
                 GestureDetector(
                   onTap:
-                      () => launchUrl(Uri.parse("https://shetravel.com/apply")),
+                      () => launchUrl(Uri.parse("https://instagram.com/invisible_guide")),
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                     margin: EdgeInsets.symmetric(horizontal: 30),
@@ -700,7 +700,7 @@ class _LandingPageState extends State<LandingPage> {
               GestureDetector(
                 onTap:
                     () =>
-                        launchUrl(Uri.parse("https://facebook.com/shetravel")),
+                        launchUrl(Uri.parse("https://facebook.com/invisible_guide")),
                 child: SvgPicture.asset(
                   width: 30,
                   height: 30,
@@ -712,7 +712,7 @@ class _LandingPageState extends State<LandingPage> {
               GestureDetector(
                 onTap:
                     () =>
-                        launchUrl(Uri.parse("https://instagram.com/shetravel")),
+                        launchUrl(Uri.parse("https://instagram.com/invisible_guide")),
                 child: SvgPicture.asset(
                   width: 30,
                   height: 30,
@@ -724,7 +724,7 @@ class _LandingPageState extends State<LandingPage> {
               GestureDetector(
                 onTap:
                     () =>
-                        launchUrl(Uri.parse("https://instagram.com/shetravel")),
+                        launchUrl(Uri.parse("https://email.com/invisible_guide")),
                 child: SvgPicture.asset(
                   width: 30,
                   height: 30,
