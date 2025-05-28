@@ -265,9 +265,12 @@ class _LandingPageState extends State<LandingPage> {
                   ),
 
                   GestureDetector(
-                    onTap:
-                        () =>
-                            launchUrl(Uri.parse("https://shetravel.com/apply")),
+                   onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ExploreToursScreen()),
+              );
+            },
                     child: Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: 30,
