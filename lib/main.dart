@@ -3,13 +3,15 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:she_travel/animation_section.dart';
+import 'package:she_travel/she_travel_web.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 void main() {
-  runApp(SheTravelApp());
+  runApp(const SheTravelApp());
 }
 
 class SheTravelApp extends StatelessWidget {
@@ -20,7 +22,25 @@ class SheTravelApp extends StatelessWidget {
     return MaterialApp(
       title: 'She Travel',
       debugShowCheckedModeBanner: false,
-      home: LandingPage(),
+      home: const ResponsiveLandingPage(),
+    );
+  }
+}
+
+class ResponsiveLandingPage extends StatelessWidget {
+  const ResponsiveLandingPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Use LayoutBuilder to detect device width
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 600) {
+          return LandingPage();
+        } else {
+          return LandingPageWeb();
+        }
+      },
     );
   }
 }
@@ -116,17 +136,14 @@ class _LandingPageState extends State<LandingPage> {
             controller: _scrollController,
             child: Column(
               children: [
-                _buildSection(key: 'home', child: _buildHeroSection()),
-                _buildSection(key: 'mission', child: _buildMission()),
-                _buildSection(key: 'tours', child: _buildUpcomingTours()),
+                _keyedSection('home', _buildHeroSection()),
+                _keyedSection('mission', _buildMission()),
+                _keyedSection('tours', _buildUpcomingTours()),
                 SizedBox(height: 40),
-                _buildSection(key: 'safety', child: _buildSafety()),
+                _keyedSection('safety', _buildSafety()),
                 SizedBox(height: 40),
-                _buildSection(key: 'past', child: _buildPastTrips()),
-                _buildSection(
-                  key: 'getInTouch',
-                  child: buildTestimonialSection(context),
-                ),
+                _keyedSection('past', _buildPastTrips()),
+                _keyedSection('getInTouch', buildTestimonialSection(context)),
                 SizedBox(height: 50),
                 _buildFooter(),
               ],
@@ -142,6 +159,13 @@ class _LandingPageState extends State<LandingPage> {
       key: _sectionKeys[key],
       width: double.infinity,
       child: child,
+    );
+  }
+
+  Widget _keyedSection(String key, Widget child) {
+    return Container(
+      key: _sectionKeys[key],
+      child: AnimatedSection(keyId: key, child: child),
     );
   }
 

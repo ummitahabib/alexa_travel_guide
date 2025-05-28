@@ -6,27 +6,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 
-void main() {
-  runApp(SheTravelApp());
-}
-
-class SheTravelApp extends StatelessWidget {
+class LandingPageWeb extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'She Travel',
-      debugShowCheckedModeBanner: false,
-      home: LandingPage(),
-    );
-  }
+  State<LandingPageWeb> createState() => _LandingPageWebState();
 }
 
-class LandingPage extends StatefulWidget {
-  @override
-  State<LandingPage> createState() => _LandingPageState();
-}
-
-class _LandingPageState extends State<LandingPage> {
+class _LandingPageWebState extends State<LandingPageWeb> {
   final ScrollController _scrollController = ScrollController();
   final Map<String, GlobalKey> _sectionKeys = {
     'home': GlobalKey(),
