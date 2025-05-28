@@ -1,6 +1,6 @@
 # she_travel
 
-A new Flutter project.
+she travel
 
 ## Getting Started
 
