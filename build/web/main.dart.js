@@ -99666,8 +99666,8 @@ return A.o1(A.aSh(A.aOJ(A.b([$.aN4(),$.aN9()],A.ae("v<aq<dK>>")),null,q),q),A.b_
 s($,"b4z","aN3",()=>{var q=t.ob,p=A.ae("e3")
 return A.aGj(A.aTr(A.aRQ(A.aBY("^",null),t.N),$.aN6(),q,p),new A.axP(),q,p,p)})
 s($,"b26","az9",()=>A.aEF())
-s($,"b5J","aCV",()=>{var q="Wellness Reset",p="1 June 2025 \u2022 08:00\u201314:00",o="A soul-nourishing retreat combining halaqa and hiking for inner renewal.",n="Dhikr Walk & Halaqah",m="26 July 2025 \u2022 07:00\u201312:00",l="A reflective walk paired with spiritual discussion and sisterhood."
-return A.b([A.Am(p,o,"assets/image_1.webp",q),A.Am(m,l,"assets/image_6.webp",n),A.Am("15\u201320 Aug 2025","Five days of culture, reflection, and bonding in the heart of Arewa.","assets/image_11.webp","Hike  Retreat"),A.Am(p,o,"assets/image_3.webp",q),A.Am(m,l,"assets/past3.webp",n),A.Am(m,l,"assets/bali.webp",n)],A.ae("v<MS>"))})
+s($,"b5J","aCV",()=>{var q="Wellness Reset",p="1 June 2025 \u2022 08:00\u201314:00",o="A soul-nourishing retreat combining halaqa and hiking for inner renewal.",n="Dhikr Walk & Halaqah",m="26 July 2025 \u2022 07:00\u201312:00",l="A reflective walk paired with spiritual discussion and sisterhood.",k="assets/image_11.webp"
+return A.b([A.Am(p,o,"assets/image_1.webp",q),A.Am(m,l,"assets/image_6.webp",n),A.Am("15\u201320 Aug 2025","Five days of culture, reflection, and bonding in the heart of Arewa.",k,"Hike  Retreat"),A.Am(p,o,k,q),A.Am(m,l,"assets/past3.webp",n),A.Am(m,l,"assets/bali.webp",n)],A.ae("v<MS>"))})
 s($,"b5G","aCU",()=>A.b([A.aB3("This retreat changed my life. I connected with amazing women and returned feeling spiritually refreshed.","Amina Yusuf",5,"Lagos, Nigeria"),A.aB3("Everything was perfectly organized. Safe, soulful, and unforgettable!","Sara Khan",4.8,"London, UK"),A.aB3("It was a beautiful experience that made me feel heard, valued, and spiritually uplifted.","Fatima Noor",4.9,"Istanbul, Turkey")],A.ae("v<RX>")))
 r($,"b0f","aKD",()=>A.OQ("AdminGalleryRoute",new A.a2O()))
 r($,"b0g","aKE",()=>A.OQ("AdminLoginRoute",new A.a2P()))

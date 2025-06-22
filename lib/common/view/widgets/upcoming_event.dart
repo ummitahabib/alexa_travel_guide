@@ -90,7 +90,7 @@ final List<Event> upcomingEvents = [
     date: "1 June 2025 • 08:00–14:00",
     description:
         "A soul-nourishing retreat combining halaqa and hiking for inner renewal.",
-    imageUrl: 'assets/image_3.webp',
+    imageUrl: 'assets/image_11.webp',
   ),
   Event(
     title: "Dhikr Walk & Halaqah",
