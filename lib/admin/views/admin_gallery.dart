@@ -4,8 +4,18 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:she_travel/gallery/data/model/gallery_model.dart';
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
 
 @RoutePage()
+
+
 class AdminGalleryScreen extends StatefulWidget {
   const AdminGalleryScreen({super.key});
 
@@ -14,42 +24,77 @@ class AdminGalleryScreen extends StatefulWidget {
 }
 
 class _AdminGalleryScreenState extends State<AdminGalleryScreen> {
-  List<GalleryImage> gallery = [];
-
   final _titleController = TextEditingController();
-  final _imageUrlController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  List<GalleryImage> gallery = [];
+  bool _isUploading = false;
 
   @override
   void initState() {
     super.initState();
-    loadGallery();
+    _loadGallery();
   }
 
-  Future<void> loadGallery() async {
-    final jsonStr = await rootBundle.loadString('assets/data/gallery.json');
-    final List<dynamic> data = json.decode(jsonStr);
+  Future<void> _loadGallery() async {
+    final snapshot = await FirebaseFirestore.instance.collection('gallery').get();
+    final items = snapshot.docs.map((doc) => GalleryImage.fromFirestore(doc)).toList();
     setState(() {
-      gallery = data.map((e) => GalleryImage.fromJson(e)).toList();
+      gallery = items;
     });
   }
 
-  void _addImage() {
-    if (_formKey.currentState!.validate()) {
-      final newImg = GalleryImage(
-        title: _titleController.text,
-        imageUrl: _imageUrlController.text,
+  Future<String?> _pickAndUploadImage() async {
+    try {
+      if (kIsWeb) {
+        final result = await FilePicker.platform.pickFiles(type: FileType.image);
+        if (result != null && result.files.single.bytes != null) {
+          final file = result.files.single;
+          final ref = FirebaseStorage.instance.ref().child('gallery/${file.name}');
+          await ref.putData(file.bytes!);
+          return await ref.getDownloadURL();
+        }
+      } else {
+        final picker = ImagePicker();
+        final picked = await picker.pickImage(source: ImageSource.gallery);
+        if (picked != null) {
+          final ref = FirebaseStorage.instance.ref().child('gallery/${picked.name}');
+          await ref.putFile(File(picked.path));
+          return await ref.getDownloadURL();
+        }
+      }
+    } catch (e) {
+      debugPrint('Image upload failed: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Upload failed. Try again.')),
       );
-      setState(() {
-        gallery.add(newImg);
-      });
-
-      _titleController.clear();
-      _imageUrlController.clear();
     }
+    return null;
   }
 
-  void _deleteImage(int index) {
+  Future<void> _addImage() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isUploading = true);
+
+    final imageUrl = await _pickAndUploadImage();
+    if (imageUrl == null) {
+      setState(() => _isUploading = false);
+      return;
+    }
+
+    final newImg = GalleryImage(title: _titleController.text, imageUrl: imageUrl);
+    final docRef = await FirebaseFirestore.instance.collection('gallery').add(newImg.toJson());
+
+    setState(() {
+      gallery.add(newImg.copyWith(id: docRef.id));
+      _titleController.clear();
+      _isUploading = false;
+    });
+  }
+
+  Future<void> _deleteImage(int index) async {
+    final img = gallery[index];
+    await FirebaseFirestore.instance.collection('gallery').doc(img.id).delete();
     setState(() {
       gallery.removeAt(index);
     });
@@ -70,40 +115,38 @@ class _AdminGalleryScreenState extends State<AdminGalleryScreen> {
                   TextFormField(
                     controller: _titleController,
                     decoration: const InputDecoration(labelText: "Title"),
-                    validator:
-                        (value) => value!.isEmpty ? 'Enter a title' : null,
+                    validator: (val) => val!.isEmpty ? 'Enter a title' : null,
                   ),
-                  TextFormField(
-                    controller: _imageUrlController,
-                    decoration: const InputDecoration(labelText: "Image Path"),
-                    validator:
-                        (value) => value!.isEmpty ? 'Enter image path' : null,
-                  ),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: _addImage,
-                    child: const Text("Add Image"),
+                  const SizedBox(height: 12),
+                  ElevatedButton.icon(
+                    onPressed: _isUploading ? null : _addImage,
+                    icon: Icon(Icons.upload),
+                    label: Text(_isUploading ? "Uploading..." : "Add Image"),
                   ),
                 ],
               ),
             ),
             const Divider(height: 32),
-            const Text("Gallery List"),
+            const Text("Gallery List", style: TextStyle(fontSize: 18)),
+            const SizedBox(height: 10),
             Expanded(
-              child: ListView.builder(
-                itemCount: gallery.length,
-                itemBuilder: (context, index) {
-                  final img = gallery[index];
-                  return ListTile(
-                    title: Text(img.title),
-                    subtitle: Text(img.imageUrl),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () => _deleteImage(index),
+              child: gallery.isEmpty
+                  ? const Center(child: Text("No images yet."))
+                  : ListView.builder(
+                      itemCount: gallery.length,
+                      itemBuilder: (context, index) {
+                        final img = gallery[index];
+                        return ListTile(
+                          leading: Image.network(img.imageUrl, width: 60, fit: BoxFit.cover),
+                          title: Text(img.title),
+                          subtitle: Text(img.imageUrl),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _deleteImage(index),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ],
         ),

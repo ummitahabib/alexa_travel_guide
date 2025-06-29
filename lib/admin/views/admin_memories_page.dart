@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:auto_route/auto_route.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:she_travel/memories_section.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'package:she_travel/admin/data/models/memory.dart';
+import 'package:universal_io/io.dart';
 
 @RoutePage()
 class AdminMemoriesScreen extends StatefulWidget {
@@ -15,55 +19,93 @@ class AdminMemoriesScreen extends StatefulWidget {
 }
 
 class _AdminMemoriesScreenState extends State<AdminMemoriesScreen> {
-  List<Memory> memories = [];
-
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descController = TextEditingController();
-  final _imageUrlController = TextEditingController();
+
+  String? imageUrl;
+  List<Memory> memories = [];
+
+  final _memoryCollection = FirebaseFirestore.instance.collection('memories');
 
   @override
   void initState() {
     super.initState();
-    loadMemories();
+    _fetchMemories();
   }
 
-  Future<void> loadMemories() async {
-    final String jsonString =
-        await rootBundle.loadString('assets/data/memories.json');
-    final List<dynamic> jsonResponse = json.decode(jsonString);
+  Future<void> _fetchMemories() async {
+    final snapshot = await _memoryCollection.get();
+    final memList = snapshot.docs
+        .map((doc) => Memory.fromFirestore(doc))
+        .toList();
     setState(() {
-      memories = jsonResponse.map((m) => Memory.fromJson(m)).toList();
+      memories = memList;
     });
   }
 
-  void _addMemory() {
-    if (_formKey.currentState!.validate()) {
-      final newMemory = Memory(
-        title: _titleController.text,
-        description: _descController.text,
-        imageUrl: _imageUrlController.text,
-      );
-      setState(() {
-        memories.add(newMemory);
-      });
+  Future<void> _uploadImage() async {
+    try {
+      final picker = ImagePicker();
 
-      // Clear form
-      _titleController.clear();
-      _descController.clear();
-      _imageUrlController.clear();
+      if (kIsWeb) {
+        final file = await picker.pickImage(source: ImageSource.gallery);
+        if (file == null) return;
 
-      // Note: Saving to file at runtime isn't supported for web
+        final bytes = await file.readAsBytes();
+        final ref = FirebaseStorage.instance
+            .ref('memories/${DateTime.now().millisecondsSinceEpoch}.jpg');
+        await ref.putData(bytes);
+        final url = await ref.getDownloadURL();
+        setState(() => imageUrl = url);
+      } else {
+        final file = await picker.pickImage(source: ImageSource.gallery);
+        if (file == null) return;
+
+        final imageFile = File(file.path);
+        final ref = FirebaseStorage.instance
+            .ref('memories/${DateTime.now().millisecondsSinceEpoch}.jpg');
+        await ref.putFile(imageFile);
+        final url = await ref.getDownloadURL();
+        setState(() => imageUrl = url);
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Memory added. Rebuild app to reflect change.")),
+        const SnackBar(content: Text("Image uploaded successfully")),
       );
+    } catch (e) {
+      debugPrint("Image upload error: $e");
     }
   }
 
-  void _deleteMemory(int index) {
-    setState(() {
-      memories.removeAt(index);
-    });
+  Future<void> _addMemory() async {
+    if (_formKey.currentState!.validate()) {
+      if (imageUrl == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please upload an image")),
+        );
+        return;
+      }
+
+      final memory = Memory(
+        title: _titleController.text.trim(),
+        description: _descController.text.trim(),
+        imageUrl: imageUrl!,
+      );
+
+      await _memoryCollection.add(memory.toJson());
+
+      _titleController.clear();
+      _descController.clear();
+      setState(() => imageUrl = null);
+
+      _fetchMemories();
+    }
+  }
+
+  Future<void> _deleteMemory(String id) async {
+    await _memoryCollection.doc(id).delete();
+    _fetchMemories();
   }
 
   @override
@@ -77,7 +119,8 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text("Add New Memory", style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w600)),
+            Text("Add New Memory",
+                style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w600)),
             Form(
               key: _formKey,
               child: Column(
@@ -92,14 +135,19 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen> {
                     decoration: const InputDecoration(labelText: 'Description'),
                     validator: (val) => val!.isEmpty ? 'Enter a description' : null,
                   ),
-                  TextFormField(
-                    controller: _imageUrlController,
-                    decoration: const InputDecoration(labelText: 'Image Path'),
-                    validator: (val) => val!.isEmpty ? 'Enter image path' : null,
-                  ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.pink.shade100),
+                    onPressed: _uploadImage,
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.pink.shade100),
+                    child: const Text("Upload Image"),
+                  ),
+                  const SizedBox(height: 10),
+                  if (imageUrl != null)
+                    Text("Image uploaded!", style: TextStyle(color: Colors.green)),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.pink.shade300),
                     onPressed: _addMemory,
                     child: const Text("Add Memory"),
                   ),
@@ -116,11 +164,14 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen> {
                   final memory = memories[index];
                   return Card(
                     child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage(memory.imageUrl),
+                      ),
                       title: Text(memory.title),
                       subtitle: Text(memory.description),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _deleteMemory(index),
+                        onPressed: () => _deleteMemory(memory.id!),
                       ),
                     ),
                   );
@@ -133,18 +184,3 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen> {
     );
   }
 }
-
-
-
-
-// ElevatedButton(
-//   onPressed: () {
-//     final jsonData = jsonEncode(memories.map((m) => {
-//       "title": m.title,
-//       "description": m.description,
-//       "imageUrl": m.imageUrl,
-//     }).toList());
-//     print(jsonData); // Copy this to your file
-//   },
-//   child: const Text("Export JSON"),
-// ),

@@ -1,12 +1,23 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:she_travel/she_travel_web.dart';
 import 'package:she_travel/utils/route.dart';
 import 'package:responsive_builder/responsive_builder.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
-  runApp(const SheTravelApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: FirebaseOptions(
+      apiKey: "AIzaSyDB1oaqJLqOQniQJdXDZ_9Nnv-2rwCrUMw",
+      appId: "1:954659216726:web:8d0f2d910d445134840af7",
+      messagingSenderId: "954659216726",
+      projectId: "shetravels-ac34a",
+      storageBucket: "shetravels-ac34a.firebasestorage.app",
+    ),
+  );
+  runApp(const ProviderScope(child: SheTravelApp()));
 }
 
 class SheTravelApp extends StatefulWidget {
@@ -30,9 +41,6 @@ class _SheTravelAppState extends State<SheTravelApp> {
     );
   }
 }
-
-
-
 
 Widget buildUpcomingTourCard(BuildContext context, UpcomingTour tour) {
   return Card(
