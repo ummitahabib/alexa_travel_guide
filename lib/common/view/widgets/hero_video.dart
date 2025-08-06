@@ -31,7 +31,7 @@ class _HeroVideoBackgroundState extends State<HeroVideoBackground> {
           if (mounted) {
             setState(() {});
             _controller.setLooping(true);
-            _controller.setVolume(0.0); // Mute
+            _controller.setVolume(0.0);
             _controller.play();
           }
         })
@@ -45,7 +45,6 @@ class _HeroVideoBackgroundState extends State<HeroVideoBackground> {
           print('Video initialization error: $error');
         });
 
-    // Listen for player errors
     _controller.addListener(() {
       if (_controller.value.hasError) {
         if (mounted) {
@@ -68,7 +67,6 @@ class _HeroVideoBackgroundState extends State<HeroVideoBackground> {
 
   @override
   Widget build(BuildContext context) {
-    // Show error state
     if (_hasError) {
       return Container(
         color: Colors.black,

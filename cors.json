@@ -1,0 +1,25 @@
+
+[
+  {
+    "origin": [
+      "http://localhost:*",
+      "http://127.0.0.1:*",
+      "https://alexa-travel-guide.vercel.app"
+    ],
+    "method": ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"],
+    "responseHeader": ["Content-Type", "Access-Control-Allow-Origin", "Access-Control-Allow-Methods"],
+    "maxAgeSeconds": 3600
+  }
+]
+
+
+
+
+
+
+
+
+
+
+
+

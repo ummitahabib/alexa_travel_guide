@@ -63,7 +63,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       );
 
       // Optional: Add check for specific admin UID
-      if (credential.user!.email != "ummihabib88@email.com") {
+      if (credential.user!.email != "ummihabib88@gmail.com") {
         throw FirebaseAuthException(
           code: "unauthorized",
           message: "Not authorized as admin",
