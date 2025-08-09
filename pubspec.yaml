@@ -56,6 +56,13 @@ dependencies:
   riverpod: ^2.6.1
   hooks_riverpod: ^2.6.1
   flutter_svg: ^2.2.0
+  flutter_stripe: ^11.5.0
+  http: ^1.4.0
+  csv: ^6.0.0
+  path_provider: ^2.1.5
+  permission_handler: ^12.0.1
+  intl: ^0.20.2
+  flutter_stripe_web: ^6.5.1
 
 dev_dependencies:
   flutter_test:

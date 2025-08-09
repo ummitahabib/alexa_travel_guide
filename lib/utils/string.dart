@@ -8,4 +8,7 @@ class RouteString {
   static const String signup = '/signup';
   static const String forgetPassword = '/forgetPassword';
   static const String adminPanel = '/admin-panel';
+  static const String adminDashboard = '/admin-dashboard';
+  static const String manageEvent = '/manage-event';
+  static const String adminBookingDashboard = '/admin-booking';
 }

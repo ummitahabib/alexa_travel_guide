@@ -235,7 +235,7 @@ class _LandingPageWebState extends State<LandingPageWeb> {
                     totalRepeatCount: 1,
                     animatedTexts: [
                       TypewriterAnimatedText(
-                        'SheTravel',
+                        'SheTravels',
                         textStyle: GoogleFonts.poppins(
                           color: Colors.pink.shade100,
                           fontSize: 55,
@@ -481,7 +481,7 @@ class _LandingPageWebState extends State<LandingPageWeb> {
           ),
           SizedBox(height: 10),
           Text(
-            'Contact SheTravel',
+            'Contact SheTravels',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -512,7 +512,7 @@ class _LandingPageWebState extends State<LandingPageWeb> {
                 children: [
                   Icon(Icons.mail, size: 20),
                   SizedBox(width: 8),
-                  Text("contact@shetravel.com"),
+                  Text("contact@shetravels.com"),
                 ],
               ),
               Row(

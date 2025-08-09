@@ -7,6 +7,7 @@ class Event {
   final String description;
   final String imageUrl;
   final String location;
+  final int price; // 💰 price in cents
 
   Event({
     this.id,
@@ -15,6 +16,7 @@ class Event {
     required this.description,
     required this.imageUrl,
     required this.location,
+    required this.price,
   });
 
   factory Event.fromFirestore(DocumentSnapshot doc) {
@@ -26,6 +28,7 @@ class Event {
       description: data['description'],
       imageUrl: data['imageUrl'],
       location: data['location'],
+      price: data['price'] ?? 0, // default to 0 if missing
     );
   }
 
@@ -35,5 +38,6 @@ class Event {
         'description': description,
         'imageUrl': imageUrl,
         'location': location,
+        'price': price,
       };
 }

@@ -1,51 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// class Memory {
-//   final String? id;
-//   final String title;
-//   final String description;
-//   final String imageUrl;
-
-//   Memory({
-//     this.id,
-//     required this.title,
-//     required this.description,
-//     required this.imageUrl,
-//   });
-
-//   factory Memory.fromFirestore(DocumentSnapshot doc) {
-//     final data = doc.data() as Map<String, dynamic>;
-//     return Memory(
-//       id: doc.id,
-//       title: data['title'],
-//       description: data['description'],
-//       imageUrl: data['imageUrl'],
-//     );
-//   }
-
-//   Map<String, dynamic> toJson() => {
-//         'title': title,
-//         'description': description,
-//         'imageUrl': imageUrl,
-//       };
-// }
-
-
-
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Memory {
   final String? id;
   final String title;
   final String description;
   final String imageUrl;
+    final String location;
+  final String category;
+  final Timestamp createdAt;
 
   Memory({
     this.id,
     required this.title,
     required this.description,
     required this.imageUrl,
+        this.location = '',
+    this.category = 'Adventure',
+    required this.createdAt,
   });
 
   factory Memory.fromFirestore(DocumentSnapshot doc) {
@@ -54,7 +26,10 @@ class Memory {
       id: doc.id,
       title: data['title'] ?? '',
       description: data['description'] ?? '',
+         location: data['location'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
+      category: data['category'] ?? 'Adventure',
+      createdAt: data['createdAt'] ?? Timestamp.now(),
     );
   }
 
@@ -62,5 +37,9 @@ class Memory {
         'title': title,
         'description': description,
         'imageUrl': imageUrl,
+              'location': location,
+      'category': category,
+      'createdAt': createdAt,
       };
 }
+

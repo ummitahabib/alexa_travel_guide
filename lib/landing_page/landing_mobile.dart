@@ -198,7 +198,7 @@ class _LandingPageState extends State<LandingPage> {
                       TypewriterAnimatedText(
                         textAlign: TextAlign.center,
 
-                        'SheTravel',
+                        'SheTravels',
                         textStyle: GoogleFonts.poppins(
                           color: Colors.pink.shade100,
                           fontSize: 35,
@@ -689,7 +689,7 @@ class _LandingPageState extends State<LandingPage> {
           alignment: WrapAlignment.center,
           children: [
             _applyButton("Website", "https://shetravel.com/apply"),
-            _applyButton("Instagram", "https://instagram.com/shetravel"),
+            _applyButton("Instagram", "https://instagram.com/shetravels"),
             _applyButton("WhatsApp", "https://wa.me/1234567890"),
           ],
         ),
@@ -740,7 +740,7 @@ class _LandingPageState extends State<LandingPage> {
                 children: [
                   Icon(Icons.mail, size: 20),
                   SizedBox(width: 8),
-                  Text("contact@shetravel.com"),
+                  Text("contact@shetravels.com"),
                 ],
               ),
               Row(

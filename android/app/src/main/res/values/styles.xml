@@ -1,0 +1,12 @@
+<resources>
+    <!-- Used for splash screen -->
+    <style name="LaunchTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/white</item>
+    </style>
+
+    <!-- Main application theme -->
+    <style name="NormalTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize theme colors as needed -->
+        <item name="android:colorPrimary">@color/purple_500</item>
+    </style>
+</resources>
