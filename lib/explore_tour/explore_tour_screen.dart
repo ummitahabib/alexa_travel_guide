@@ -3,8 +3,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:she_travel/explore_tour/tour_details.dart';
-import 'package:she_travel/gallery/data/model/gallery_model.dart';
+import 'package:shetravels/explore_tour/tour_details.dart';
+import 'package:shetravels/gallery/data/model/gallery_model.dart';
 
 class ExploreToursScreen extends StatefulWidget {
   const ExploreToursScreen({super.key});

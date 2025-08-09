@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:she_travel/utils/utils.dart';
+import 'package:shetravels/utils/utils.dart';
 import 'package:video_player/video_player.dart';
 
 class HeroVideoBackground extends StatefulWidget {

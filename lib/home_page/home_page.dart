@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart' show RoutePage;
 import 'package:flutter/material.dart';
-import 'package:she_travel/landing_page/landing_mobile.dart';
-import 'package:she_travel/landing_page/landing_web.dart';
+import 'package:shetravels/landing_page/landing_mobile.dart';
+import 'package:shetravels/landing_page/landing_web.dart';
 
 @RoutePage()
 class HomeScreen extends StatelessWidget {

@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:she_travel/admin/data/event_model.dart';
+import 'package:shetravels/admin/data/event_model.dart';
 
 class EventRepository {
   final _eventsRef = FirebaseFirestore.instance.collection('events');

@@ -1,8 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:she_travel/auth/data/controller/auth_controller.dart';
-import 'package:she_travel/utils/route.gr.dart';
+import 'package:shetravels/auth/data/controller/auth_controller.dart';
+import 'package:shetravels/utils/route.gr.dart';
 
 @RoutePage()
 class ForgetPasswordScreen extends ConsumerStatefulWidget {
@@ -126,7 +126,7 @@ class _ForgetPasswordScreenState extends ConsumerState<ForgetPasswordScreen>
                             const SizedBox(height: 24),
                             // Brand Name
                             const Text(
-                              "She Travels",
+                              "SheTravels",
                               style: TextStyle(
                                 fontSize: 32,
                                 fontWeight: FontWeight.bold,

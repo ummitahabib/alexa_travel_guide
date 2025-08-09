@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_stripe/flutter_stripe.dart' as stp;
 import 'package:google_fonts/google_fonts.dart';
-import 'package:she_travel/she_travel_web.dart';
-import 'package:she_travel/utils/route.dart';
+import 'package:shetravels/she_travel_web.dart';
+import 'package:shetravels/utils/route.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -37,7 +37,7 @@ class _SheTravelAppState extends State<SheTravelApp> {
     return ResponsiveApp(
       builder:
           (context) => MaterialApp.router(
-            title: 'She Travel',
+            title: 'SheTravels',
             routerConfig: appRouter.config(),
             debugShowCheckedModeBanner: false,
           ),

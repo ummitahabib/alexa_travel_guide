@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:she_travel/admin/data/models/memory.dart';
+import 'package:shetravels/admin/data/models/memory.dart';
 import 'package:universal_io/io.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';

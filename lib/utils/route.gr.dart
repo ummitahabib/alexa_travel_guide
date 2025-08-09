@@ -10,19 +10,19 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i13;
-import 'package:she_travel/admin/views/admin_gallery.dart' as _i3;
-import 'package:she_travel/admin/views/admin_login.dart' as _i4;
-import 'package:she_travel/admin/views/admin_main_dashboard.dart' as _i2;
-import 'package:she_travel/admin/views/admin_manage_event.dart' as _i5;
-import 'package:she_travel/admin/views/admin_memories_page.dart' as _i6;
-import 'package:she_travel/admin/views/admin_panel.dart' as _i7;
-import 'package:she_travel/auth/views/screens/forgot_password_screen.dart'
+import 'package:shetravels/admin/views/admin_gallery.dart' as _i3;
+import 'package:shetravels/admin/views/admin_login.dart' as _i4;
+import 'package:shetravels/admin/views/admin_main_dashboard.dart' as _i2;
+import 'package:shetravels/admin/views/admin_manage_event.dart' as _i5;
+import 'package:shetravels/admin/views/admin_memories_page.dart' as _i6;
+import 'package:shetravels/admin/views/admin_panel.dart' as _i7;
+import 'package:shetravels/auth/views/screens/forgot_password_screen.dart'
     as _i8;
-import 'package:she_travel/auth/views/screens/login_screen.dart' as _i10;
-import 'package:she_travel/auth/views/screens/signup_screen.dart' as _i11;
-import 'package:she_travel/booking/views/admin_booking_dashboard.dart' as _i1;
-import 'package:she_travel/home_page/home_page.dart' as _i9;
-import 'package:she_travel/splash/splash_screen.dart' as _i12;
+import 'package:shetravels/auth/views/screens/login_screen.dart' as _i10;
+import 'package:shetravels/auth/views/screens/signup_screen.dart' as _i11;
+import 'package:shetravels/booking/views/admin_booking_dashboard.dart' as _i1;
+import 'package:shetravels/home_page/home_page.dart' as _i9;
+import 'package:shetravels/splash/splash_screen.dart' as _i12;
 
 /// generated route for
 /// [_i1.AdminBookingDashboardScreen]

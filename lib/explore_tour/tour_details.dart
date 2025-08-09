@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:she_travel/gallery/data/model/gallery_model.dart';
+import 'package:shetravels/gallery/data/model/gallery_model.dart';
 
 class TourDetailScreen extends StatelessWidget {
   final GalleryImage tour;

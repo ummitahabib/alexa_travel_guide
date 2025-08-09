@@ -1,4 +1,4 @@
-package com.example.she_travel
+package com.example.shetravels
 
 import io.flutter.embedding.android.FlutterActivity
 

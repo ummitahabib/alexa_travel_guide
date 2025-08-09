@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:she_travel/utils/route.gr.dart';
-import 'package:she_travel/utils/string.dart';
+import 'package:shetravels/utils/route.gr.dart';
+import 'package:shetravels/utils/string.dart';
 
 @AutoRouterConfig(replaceInRouteName: 'Screen|Page,Route')
 class AppRouter extends RootStackRouter {

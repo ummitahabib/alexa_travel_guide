@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:she_travel/she_travel_web.dart';
+import 'package:shetravels/she_travel_web.dart';
 
 Widget buildUpcomingToursSection(BuildContext context) {
   return Column(

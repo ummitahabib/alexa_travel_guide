@@ -139,7 +139,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:she_travel/admin/data/models/memory.dart';
+import 'package:shetravels/admin/data/models/memory.dart';
 
 class MemoriesSection extends StatefulWidget {
   const MemoriesSection({Key? key}) : super(key: key);

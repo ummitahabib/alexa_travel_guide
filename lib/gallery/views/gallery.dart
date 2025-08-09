@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:she_travel/gallery/data/controller/gallery_controller.dart';
-import 'package:she_travel/gallery/data/model/gallery_model.dart';
+import 'package:shetravels/gallery/data/controller/gallery_controller.dart';
+import 'package:shetravels/gallery/data/model/gallery_model.dart';
 
 // class GallerySection extends StatefulWidget {
 //   const GallerySection({super.key});

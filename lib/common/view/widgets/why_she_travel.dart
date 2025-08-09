@@ -1,8 +1,8 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:she_travel/common/data/models/usp_model.dart';
-import 'package:she_travel/utils/utils.dart';
+import 'package:shetravels/common/data/models/usp_model.dart';
+import 'package:shetravels/utils/utils.dart';
 
 Widget buildWhyChooseSheTravelsSection() {
   return Padding(

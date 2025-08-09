@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:she_travel/utils/utils.dart';
+import 'package:shetravels/utils/utils.dart';
 
 Widget buildFounderSection(BuildContext context) {
   return Padding(

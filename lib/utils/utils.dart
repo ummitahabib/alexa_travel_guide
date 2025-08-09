@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:she_travel/common/data/models/founder_message.dart';
-import 'package:she_travel/common/data/models/usp_model.dart';
-import 'package:she_travel/she_travel_web.dart';
+import 'package:shetravels/common/data/models/founder_message.dart';
+import 'package:shetravels/common/data/models/usp_model.dart';
+import 'package:shetravels/she_travel_web.dart';
 
 const double desktopScreenWidthThreshold = 850;
 
@@ -46,7 +46,7 @@ final founderMessage = FounderMessage(
   title: 'Founder & Guide',
   imageUrl: 'assets/aleksa_portrait.png',
   message:
-      '“When I started She Travels, it was my dream to bring women together—under the open sky, rooted in faith and sisterhood. Each journey is guided with intention, compassion, and a heart for renewal. I invite you to walk this path with us, reconnect, and rediscover the beauty of community.”',
+      '“When I started SheTravels, it was my dream to bring women together—under the open sky, rooted in faith and sisterhood. Each journey is guided with intention, compassion, and a heart for renewal. I invite you to walk this path with us, reconnect, and rediscover the beauty of community.”',
 );
 
 final List<Testimonial> testimonials = [

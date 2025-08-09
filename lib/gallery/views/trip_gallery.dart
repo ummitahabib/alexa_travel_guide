@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:she_travel/she_travel_web.dart';
+import 'package:shetravels/she_travel_web.dart';
 
 class TripGalleryPage extends StatelessWidget {
   final PastTrip trip;

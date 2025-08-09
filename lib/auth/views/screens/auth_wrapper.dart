@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:she_travel/admin/views/admin_panel.dart';
-import 'package:she_travel/auth/data/controller/auth_controller.dart';
-import 'package:she_travel/auth/views/screens/login_screen.dart';
+import 'package:shetravels/admin/views/admin_panel.dart';
+import 'package:shetravels/auth/data/controller/auth_controller.dart';
+import 'package:shetravels/auth/views/screens/login_screen.dart';
 
 class AuthWrapper extends ConsumerWidget {
   const AuthWrapper({super.key});

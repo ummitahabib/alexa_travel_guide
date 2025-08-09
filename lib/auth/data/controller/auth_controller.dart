@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:she_travel/auth/data/repository/auth_repository.dart';
-import 'package:she_travel/utils/route.gr.dart';
+import 'package:shetravels/auth/data/repository/auth_repository.dart';
+import 'package:shetravels/utils/route.gr.dart';
 
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
   return FirebaseAuth.instance;

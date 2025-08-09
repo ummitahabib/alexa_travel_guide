@@ -1,6 +1,6 @@
-# she_travel
+# shetravels
 
-she travel
+shetravels
 
 ## Getting Started
 

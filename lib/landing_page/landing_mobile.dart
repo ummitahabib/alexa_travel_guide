@@ -4,17 +4,16 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:she_travel/animation_section.dart';
-import 'package:she_travel/common/view/widgets/build_founder_section.dart';
-import 'package:she_travel/common/view/widgets/hero_video.dart';
-import 'package:she_travel/common/view/widgets/why_she_travel.dart';
-import 'package:she_travel/explore_tour/explore_tour_screen.dart';
-import 'package:she_travel/gallery/views/gallery.dart';
-import 'package:she_travel/memories_section.dart';
-import 'package:she_travel/she_travel_web.dart';
-import 'package:she_travel/upcoming_tour.dart';
-import 'package:she_travel/utils/route.dart';
-import 'package:she_travel/utils/route.gr.dart';
+import 'package:shetravels/animation_section.dart';
+import 'package:shetravels/common/view/widgets/build_founder_section.dart';
+import 'package:shetravels/common/view/widgets/hero_video.dart';
+import 'package:shetravels/common/view/widgets/why_she_travel.dart';
+import 'package:shetravels/explore_tour/explore_tour_screen.dart';
+import 'package:shetravels/gallery/views/gallery.dart';
+import 'package:shetravels/memories_section.dart';
+import 'package:shetravels/she_travel_web.dart';
+import 'package:shetravels/upcoming_tour.dart';
+import 'package:shetravels/utils/route.gr.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:animate_do/animate_do.dart';
@@ -60,7 +59,7 @@ class _LandingPageState extends State<LandingPage> {
 
   @override
   Widget build(BuildContext context) {
-    const String assetName = 'assets/she_travel.svg';
+    const String assetName = 'assets/shetravels.svg';
     final Widget svg = SvgPicture.asset(
       assetName,
       semanticsLabel: 'App Logo',
@@ -246,7 +245,7 @@ class _LandingPageState extends State<LandingPage> {
                     width: 500,
                     child: Text(
                       softWrap: true,
-                      "Welcome to She Travel, your ultimate resource for Curated travel experiences and nature retreats for women who seek connection, renewal, and adventure",
+                      "Welcome to SheTravels, your ultimate resource for Curated travel experiences and nature retreats for women who seek connection, renewal, and adventure",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 18,
@@ -351,7 +350,7 @@ class _LandingPageState extends State<LandingPage> {
 
               Text(
                 softWrap: true,
-                "She Travels is more than travel — it’s a journey back to yourself. Founded and guided by Aleksa, our trips blend nature, faith-friendly spaces, reflection, and real connection between women. Whether it’s a quiet hike or a soulful retreat, you’re never alone.",
+                "SheTravels is more than travel — it’s a journey back to yourself. Founded and guided by Aleksa, our trips blend nature, faith-friendly spaces, reflection, and real connection between women. Whether it’s a quiet hike or a soulful retreat, you’re never alone.",
 
                 style: GoogleFonts.poppins(fontSize: 17),
               ),
@@ -397,7 +396,7 @@ class _LandingPageState extends State<LandingPage> {
           FadeInUp(
             duration: Duration(milliseconds: 800),
             child: Text(
-              'At She Travel, we understand the unique concerns of women travelers. '
+              'At SheTravels, we understand the unique concerns of women travelers. '
               'That’s why we’ve built our platform with a strong emphasis on safety and convenience, '
               'ensuring every journey is enjoyable and worry-free.',
               textAlign: TextAlign.center,
@@ -410,7 +409,7 @@ class _LandingPageState extends State<LandingPage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _buildAnimatedStat(
-                label: 'Of our users report feeling safer using She Travel',
+                label: 'Of our users report feeling safer using SheTravels',
                 value: 98,
                 suffix: '%',
                 delay: 0,
@@ -834,7 +833,7 @@ class _LandingPageState extends State<LandingPage> {
           ),
           SizedBox(height: 30),
           Text(
-            "© 2025 She Travel. All rights reserved.",
+            "© 2025 SheTravels. All rights reserved.",
             style: TextStyle(fontSize: 12, color: Colors.black54),
           ),
         ],

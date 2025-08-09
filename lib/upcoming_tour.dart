@@ -6,12 +6,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:she_travel/admin/data/controller/event_controller.dart';
+import 'package:shetravels/admin/data/controller/event_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
 import 'dart:html' as html;
-import 'package:she_travel/auth/views/screens/login_screen.dart';
+import 'package:shetravels/auth/views/screens/login_screen.dart';
 
 
 

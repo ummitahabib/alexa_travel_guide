@@ -1,11 +1,11 @@
 {
-    "name": "she_travel",
-    "short_name": "she_travel",
+    "name": "shetravels",
+    "short_name": "shetravels",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "she travel",
+    "description": "shetravels",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

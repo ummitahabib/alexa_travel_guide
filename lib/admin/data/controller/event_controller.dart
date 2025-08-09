@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:she_travel/admin/data/event_model.dart';
-import 'package:she_travel/admin/data/event_repository/event_repository.dart';
+import 'package:shetravels/admin/data/event_model.dart';
+import 'package:shetravels/admin/data/event_repository/event_repository.dart';
 
 final eventRepositoryProvider = Provider((ref) => EventRepository());
 

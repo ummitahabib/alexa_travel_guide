@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:she_travel/admin/views/admin_gallery.dart';
-import 'package:she_travel/admin/views/admin_manage_event.dart';
-import 'package:she_travel/admin/views/admin_memories_page.dart';
-import 'package:she_travel/booking/views/admin_booking_dashboard.dart';
-import 'package:she_travel/utils/route.gr.dart';
+import 'package:shetravels/admin/views/admin_gallery.dart';
+import 'package:shetravels/admin/views/admin_manage_event.dart';
+import 'package:shetravels/admin/views/admin_memories_page.dart';
+import 'package:shetravels/booking/views/admin_booking_dashboard.dart';
+import 'package:shetravels/utils/route.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -167,7 +167,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      "She Travels",
+                      "SheTravels",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -348,7 +348,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "She Travels",
+                          "SheTravels",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,
@@ -752,7 +752,7 @@ class NavigationItem {
 //                     ),
 //                     const SizedBox(height: 16),
 //                     const Text(
-//                       "She Travels",
+//                       "SheTravels",
 //                       style: TextStyle(
 //                         color: Colors.white,
 //                         fontSize: 24,
@@ -929,7 +929,7 @@ class NavigationItem {
 //                       crossAxisAlignment: CrossAxisAlignment.start,
 //                       children: [
 //                         Text(
-//                           "She Travels",
+//                           "SheTravels",
 //                           style: TextStyle(
 //                             color: Colors.white,
 //                             fontSize: 20,

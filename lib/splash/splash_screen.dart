@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:she_travel/splash/animated_spiral_lines.dart';
-import 'package:she_travel/utils/route.gr.dart';
+import 'package:shetravels/splash/animated_spiral_lines.dart';
+import 'package:shetravels/utils/route.gr.dart';
 
 @RoutePage()
 class SplashScreen extends StatefulWidget {
