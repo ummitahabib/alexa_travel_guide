@@ -50,7 +50,14 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
   final _memoryCollection = FirebaseFirestore.instance.collection('memories');
 
   final List<String> _categories = [
-    'Adventure', 'Cultural', 'Nature', 'Food', 'City', 'Beach', 'Mountain', 'Festival'
+    'Adventure',
+    'Cultural',
+    'Nature',
+    'Food',
+    'City',
+    'Beach',
+    'Mountain',
+    'Festival',
   ];
 
   final Map<String, IconData> _categoryIcons = {
@@ -103,7 +110,9 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _slideController, curve: Curves.elasticOut));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.elasticOut),
+    );
     _heartAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _heartController, curve: Curves.elasticOut),
     );
@@ -130,12 +139,10 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
   Future<void> _fetchMemories() async {
     setState(() => isLoading = true);
     try {
-      final snapshot = await _memoryCollection
-          .orderBy('createdAt', descending: true)
-          .get();
-      final memList = snapshot.docs
-          .map((doc) => Memory.fromFirestore(doc))
-          .toList();
+      final snapshot =
+          await _memoryCollection.orderBy('createdAt', descending: true).get();
+      final memList =
+          snapshot.docs.map((doc) => Memory.fromFirestore(doc)).toList();
       setState(() {
         memories = memList;
         filteredMemories = memList;
@@ -150,11 +157,12 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
   void _filterMemories() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      filteredMemories = memories.where((memory) {
-        return memory.title.toLowerCase().contains(query) ||
-            memory.description.toLowerCase().contains(query) ||
-            memory.location.toLowerCase().contains(query);
-      }).toList();
+      filteredMemories =
+          memories.where((memory) {
+            return memory.title.toLowerCase().contains(query) ||
+                memory.description.toLowerCase().contains(query) ||
+                memory.location.toLowerCase().contains(query);
+          }).toList();
     });
   }
 
@@ -169,7 +177,7 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
         maxHeight: 1080,
         imageQuality: 85,
       );
-      
+
       if (file == null) {
         setState(() => isUploading = false);
         return;
@@ -236,7 +244,7 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
   Future<void> _deleteMemory(Memory memory) async {
     try {
       await _memoryCollection.doc(memory.id).delete();
-      
+
       // Try to delete image from storage
       try {
         final ref = FirebaseStorage.instance.refFromURL(memory.imageUrl);
@@ -256,323 +264,365 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        child: Container(
-          width: isWeb ? 600 : double.infinity,
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.9,
-          ),
-          padding: const EdgeInsets.all(32),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFFffeef8), Color(0xFFf8f9fa)],
+      builder:
+          (context) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
             ),
-          ),
-          child: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Header with Heart Animation
-                  Row(
+            child: Container(
+              width: isWeb ? 600 : double.infinity,
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.9,
+              ),
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFFffeef8), Color(0xFFf8f9fa)],
+                ),
+              ),
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      ScaleTransition(
-                        scale: _heartAnimation,
-                        child: Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            gradient: 
-                            const LinearGradient(
-                         
-                             colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                      // Header with Heart Animation
+                      Row(
+                        children: [
+                          ScaleTransition(
+                            scale: _heartAnimation,
+                            child: Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFF667eea),
+                                    Color(0xFF764ba2),
+                                  ],
+                                ),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFFf093fb,
+                                    ).withOpacity(0.3),
+                                    blurRadius: 15,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.favorite,
+                                color: Colors.white,
+                                size: 30,
+                              ),
                             ),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFFf093fb).withOpacity(0.3),
-                                blurRadius: 15,
-                                offset: const Offset(0, 8),
+                          ),
+                          const SizedBox(width: 20),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Create New Memory',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF2c3e50),
+                                  ),
+                                ),
+                                Text(
+                                  'Capture a beautiful moment forever',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 32),
+
+                      // Form Fields
+                      _buildStyledTextField(
+                        controller: _titleController,
+                        label: 'Memory Title',
+                        icon: Icons.title,
+                        validator:
+                            (val) => val!.isEmpty ? 'Enter a title' : null,
+                      ),
+                      const SizedBox(height: 20),
+
+                      _buildStyledTextField(
+                        controller: _locationController,
+                        label: 'Location',
+                        icon: Icons.location_on,
+                        validator:
+                            (val) => val!.isEmpty ? 'Enter a location' : null,
+                      ),
+                      const SizedBox(height: 20),
+
+                      _buildStyledTextField(
+                        controller: _descController,
+                        label: 'Description',
+                        icon: Icons.description,
+                        maxLines: 3,
+                        validator:
+                            (val) =>
+                                val!.isEmpty ? 'Enter a description' : null,
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Category Selection
+                      Text(
+                        'Memory Category',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.grey[300]!),
+                        ),
+                        child: DropdownButtonFormField<String>(
+                          value: _selectedCategory,
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(
+                              _categoryIcons[_selectedCategory],
+                              color: _categoryColors[_selectedCategory],
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide.none,
+                            ),
+                            filled: true,
+                            fillColor: Colors.transparent,
+                          ),
+                          items:
+                              _categories
+                                  .map(
+                                    (category) => DropdownMenuItem(
+                                      value: category,
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            _categoryIcons[category],
+                                            color: _categoryColors[category],
+                                            size: 20,
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Text(category),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                          onChanged:
+                              (value) =>
+                                  setState(() => _selectedCategory = value!),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Image Upload Section
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.grey[300]!),
+                        ),
+                        child: Column(
+                          children: [
+                            if (imageUrl == null) ...[
+                              Icon(
+                                Icons.cloud_upload,
+                                size: 50,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                'Upload Memory Image',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Container(
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFF667eea),
+                                      Color(0xFF764ba2),
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: ElevatedButton.icon(
+                                  onPressed: isUploading ? null : _uploadImage,
+                                  icon:
+                                      isUploading
+                                          ? const SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                          : const Icon(
+                                            Icons.upload,
+                                            color: Colors.white,
+                                          ),
+                                  label: Text(
+                                    isUploading
+                                        ? 'Uploading...'
+                                        : 'Choose Image',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 32,
+                                      vertical: 16,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ] else ...[
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Image.network(
+                                  imageUrl!,
+                                  height: 200,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.check_circle,
+                                    color: Colors.green,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    'Image uploaded successfully!',
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  TextButton.icon(
+                                    onPressed:
+                                        () => setState(() => imageUrl = null),
+                                    icon: const Icon(Icons.refresh, size: 18),
+                                    label: const Text('Change'),
+                                  ),
+                                ],
                               ),
                             ],
-                          ),
-                          child: const Icon(
-                            Icons.favorite,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Create New Memory',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF2c3e50),
-                              ),
-                            ),
-                            Text(
-                              'Capture a beautiful moment forever',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                              ),
-                            ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 32),
+                      const SizedBox(height: 32),
 
-                  // Form Fields
-                  _buildStyledTextField(
-                    controller: _titleController,
-                    label: 'Memory Title',
-                    icon: Icons.title,
-                    validator: (val) => val!.isEmpty ? 'Enter a title' : null,
-                  ),
-                  const SizedBox(height: 20),
-
-                  _buildStyledTextField(
-                    controller: _locationController,
-                    label: 'Location',
-                    icon: Icons.location_on,
-                    validator: (val) => val!.isEmpty ? 'Enter a location' : null,
-                  ),
-                  const SizedBox(height: 20),
-
-                  _buildStyledTextField(
-                    controller: _descController,
-                    label: 'Description',
-                    icon: Icons.description,
-                    maxLines: 3,
-                    validator: (val) => val!.isEmpty ? 'Enter a description' : null,
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Category Selection
-                  Text(
-                    'Memory Category',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[700],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey[300]!),
-                    ),
-                    child: DropdownButtonFormField<String>(
-                      value: _selectedCategory,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(
-                          _categoryIcons[_selectedCategory],
-                          color: _categoryColors[_selectedCategory],
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
-                        filled: true,
-                        fillColor: Colors.transparent,
-                      ),
-                      items: _categories.map((category) => DropdownMenuItem(
-                        value: category,
-                        child: Row(
-                          children: [
-                            Icon(
-                              _categoryIcons[category],
-                              color: _categoryColors[category],
-                              size: 20,
-                            ),
-                            const SizedBox(width: 12),
-                            Text(category),
-                          ],
-                        ),
-                      )).toList(),
-                      onChanged: (value) => setState(() => _selectedCategory = value!),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Image Upload Section
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey[300]!),
-                    ),
-                    child: Column(
-                      children: [
-                        if (imageUrl == null) ...[
-                          Icon(
-                            Icons.cloud_upload,
-                            size: 50,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'Upload Memory Image',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFf093fb), Color(0xFFf5576c)],
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: ElevatedButton.icon(
-                              onPressed: isUploading ? null : _uploadImage,
-                              icon: isUploading
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : const Icon(Icons.upload, color: Colors.white),
-                              label: Text(
-                                isUploading ? 'Uploading...' : 'Choose Image',
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
+                      // Action Buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                setState(() => imageUrl = null);
+                              },
+                              style: TextButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 32,
                                   vertical: 16,
                                 ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                              child: const Text('Cancel'),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            flex: 2,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFF667eea),
+                                    Color(0xFF764ba2),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFFf093fb,
+                                    ).withOpacity(0.3),
+                                    blurRadius: 15,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: ElevatedButton.icon(
+                                onPressed: _addMemory,
+                                icon: const Icon(
+                                  Icons.favorite,
+                                  color: Colors.white,
+                                ),
+                                label: const Text(
+                                  'Create Memory',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ] else ...[
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Image.network(
-                              imageUrl!,
-                              height: 200,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              const Icon(Icons.check_circle, color: Colors.green),
-                              const SizedBox(width: 8),
-                              const Text(
-                                'Image uploaded successfully!',
-                                style: TextStyle(
-                                  color: Colors.green,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const Spacer(),
-                              TextButton.icon(
-                                onPressed: () => setState(() => imageUrl = null),
-                                icon: const Icon(Icons.refresh, size: 18),
-                                label: const Text('Change'),
-                              ),
-                            ],
                           ),
                         ],
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-
-                  // Action Buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            setState(() => imageUrl = null);
-                          },
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                          child: const Text('Cancel'),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        flex: 2,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFFf093fb), Color(0xFFf5576c)],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFFf093fb).withOpacity(0.3),
-                                blurRadius: 15,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: ElevatedButton.icon(
-                            onPressed: _addMemory,
-                            icon: const Icon(Icons.favorite, color: Colors.white),
-                            label: const Text(
-                              'Create Memory',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                          ),
-                        ),
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
     );
   }
 
@@ -607,197 +657,213 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
   void _showMemoryDetail(Memory memory) {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Container(
-          constraints: BoxConstraints(
-            maxWidth: isWeb ? 700 : MediaQuery.of(context).size.width * 0.9,
-            maxHeight: MediaQuery.of(context).size.height * 0.8,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Close button
-              Align(
-                alignment: Alignment.topRight,
-                child: Container(
-                  margin: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ),
+      builder:
+          (context) => Dialog(
+            backgroundColor: Colors.transparent,
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: isWeb ? 700 : MediaQuery.of(context).size.width * 0.9,
+                maxHeight: MediaQuery.of(context).size.height * 0.8,
               ),
-              
-              // Memory content
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Close button
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Container(
+                      margin: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        shape: BoxShape.circle,
                       ),
-                    ],
+                      child: IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Image
-                      Expanded(
-                        flex: 2,
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(24),
+
+                  // Memory content
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
                           ),
-                          child: Image.network(
-                            memory.imageUrl,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                        ],
                       ),
-                      
-                      // Content
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Image
+                          Expanded(
+                            flex: 2,
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(24),
+                              ),
+                              child: Image.network(
+                                memory.imageUrl,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+
+                          // Content
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(24),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: _categoryColors[memory.category]?.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Icon(
-                                      _categoryIcons[memory.category] ?? Icons.favorite,
-                                      color: _categoryColors[memory.category],
-                                      size: 20,
-                                    ),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: _categoryColors[memory
+                                                  .category]
+                                              ?.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          _categoryIcons[memory.category] ??
+                                              Icons.favorite,
+                                          color:
+                                              _categoryColors[memory.category],
+                                          size: 20,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          memory.title,
+                                          style: const TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF2c3e50),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 12),
+                                  const SizedBox(height: 12),
+
+                                  if (memory.location.isNotEmpty) ...[
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.location_on,
+                                          color: Color(0xFFf093fb),
+                                          size: 18,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          memory.location,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey[600],
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 12),
+                                  ],
+
                                   Expanded(
                                     child: Text(
-                                      memory.title,
-                                      style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF2c3e50),
+                                      memory.description,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey[700],
+                                        height: 1.5,
+                                      ),
+                                    ),
+                                  ),
+
+                                  // Category tag
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 8,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            _categoryColors[memory.category] ??
+                                                const Color(0xFFf093fb),
+                                            (_categoryColors[memory.category] ??
+                                                    const Color(0xFFf093fb))
+                                                .withOpacity(0.7),
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        memory.category,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 12),
-                              
-                              if (memory.location.isNotEmpty) ...[
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.location_on,
-                                      color: Color(0xFFf093fb),
-                                      size: 18,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      memory.location,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.grey[600],
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                              ],
-                              
-                              Expanded(
-                                child: Text(
-                                  memory.description,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey[700],
-                                    height: 1.5,
-                                  ),
-                                ),
-                              ),
-                              
-                              // Category tag
-                              Container(
-                                alignment: Alignment.centerLeft,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        _categoryColors[memory.category] ?? const Color(0xFFf093fb),
-                                        (_categoryColors[memory.category] ?? const Color(0xFFf093fb)).withOpacity(0.7),
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    memory.category,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 
   void _showDeleteDialog(Memory memory) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Delete Memory'),
-        content: Text('Are you sure you want to delete "${memory.title}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: const Text('Delete Memory'),
+            content: Text('Are you sure you want to delete "${memory.title}"?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _deleteMemory(memory);
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                child: const Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _deleteMemory(memory);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
     );
   }
 
@@ -845,7 +911,7 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
                   padding: EdgeInsets.all(isWeb ? 32 : 20),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFFf093fb), Color(0xFFf5576c)],
+                      colors: [Color(0xFF667eea), Color(0xFF764ba2)],
                     ),
                     boxShadow: [
                       BoxShadow(
@@ -945,48 +1011,49 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
 
                 // Content Section
                 Expanded(
-                  child: isLoading
-                      ? const Center(
-                          child: CircularProgressIndicator(
-                            color: Color(0xFFf093fb),
-                          ),
-                        )
-                      : filteredMemories.isEmpty
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.favorite_border,
-                                    size: 80,
-                                    color: Colors.grey[400],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    _searchController.text.isNotEmpty
-                                        ? 'No memories match your search'
-                                        : 'No memories yet',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  if (_searchController.text.isEmpty)
-                                    Text(
-                                      'Create your first beautiful memory!',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey[500],
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            )
-                          : Padding(
-                              padding: EdgeInsets.all(isWeb ? 24 : 16),
-                              child: _buildMemoriesGrid(),
+                  child:
+                      isLoading
+                          ? const Center(
+                            child: CircularProgressIndicator(
+                              color: Color(0xFFf093fb),
                             ),
+                          )
+                          : filteredMemories.isEmpty
+                          ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.favorite_border,
+                                  size: 80,
+                                  color: Colors.grey[400],
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  _searchController.text.isNotEmpty
+                                      ? 'No memories match your search'
+                                      : 'No memories yet',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                if (_searchController.text.isEmpty)
+                                  Text(
+                                    'Create your first beautiful memory!',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[500],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          )
+                          : Padding(
+                            padding: EdgeInsets.all(isWeb ? 24 : 16),
+                            child: _buildMemoriesGrid(),
+                          ),
                 ),
               ],
             ),
@@ -1000,7 +1067,8 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
     return GridView.builder(
       itemCount: filteredMemories.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: isWeb ? 3 : (MediaQuery.of(context).size.width > 600 ? 2 : 1),
+        crossAxisCount:
+            isWeb ? 3 : (MediaQuery.of(context).size.width > 600 ? 2 : 1),
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
         childAspectRatio: 0.85,
@@ -1013,8 +1081,9 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
   }
 
   Widget _buildMemoryCard(Memory memory) {
-    final categoryColor = _categoryColors[memory.category] ?? const Color(0xFFf093fb);
-    
+    final categoryColor =
+        _categoryColors[memory.category] ?? const Color(0xFFf093fb);
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -1079,7 +1148,7 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
                         ),
                       ),
                     ),
-                    
+
                     // Category Badge
                     Positioned(
                       top: 12,
@@ -1126,7 +1195,7 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
                         ),
                       ),
                     ),
-                    
+
                     // Gradient Overlay at bottom
                     Positioned(
                       bottom: 0,
@@ -1146,7 +1215,7 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
                         ),
                       ),
                     ),
-                    
+
                     // Heart Icon
                     Positioned(
                       bottom: 12,
@@ -1167,7 +1236,7 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
                   ],
                 ),
               ),
-              
+
               // Content Section
               Expanded(
                 flex: 2,
@@ -1187,7 +1256,7 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 6),
-                      
+
                       if (memory.location.isNotEmpty) ...[
                         Row(
                           children: [
@@ -1213,7 +1282,7 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
                         ),
                         const SizedBox(height: 6),
                       ],
-                      
+
                       Expanded(
                         child: Text(
                           memory.description,
@@ -1226,7 +1295,7 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      
+
                       // Action Row
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1297,5 +1366,3 @@ class _AdminMemoriesScreenState extends State<AdminMemoriesScreen>
     }
   }
 }
-
-

@@ -934,6 +934,7 @@ class _AdminGalleryScreenState extends State<AdminGalleryScreen>
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         image.title,
@@ -946,44 +947,54 @@ class _AdminGalleryScreenState extends State<AdminGalleryScreen>
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF667eea).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          image.category,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF667eea),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      const Spacer(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                            onPressed: () => _showDeleteDialog(image),
-                            icon: const Icon(
-                              Icons.delete_outline,
-                              color: Colors.red,
-                              size: 20,
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                            //    vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF667eea).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                image.category,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF667eea),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                          ),
-                        ],
+                         Spacer(),
+                            
+                            IconButton(
+                              onPressed: () => _showDeleteDialog(image),
+                              icon: const Icon(
+                                Icons.delete_outline,
+                                color: Colors.red,
+                                size: 20,
+                              ),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          
+                          
+                          ],
+                        ),
                       ),
+                
                     ],
                   ),
                 ),
               ),
+           
+           
+           
             ],
           ),
         ),

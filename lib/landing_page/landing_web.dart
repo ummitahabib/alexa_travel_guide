@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -14,6 +15,7 @@ import 'package:she_travel/gallery/views/gallery.dart';
 import 'package:she_travel/main.dart';
 import 'package:she_travel/memories_section.dart';
 import 'package:she_travel/she_travel_web.dart';
+import 'package:she_travel/utils/route.gr.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 
@@ -148,7 +150,7 @@ class _LandingPageWebState extends State<LandingPageWeb> {
 
               child: Center(
                 child: Text(
-                  "Hike schedule",
+                  "Sign Up",
                   style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontSize: 16,
@@ -159,12 +161,8 @@ class _LandingPageWebState extends State<LandingPageWeb> {
             ),
           ),
           GestureDetector(
-            //onTap: () => launchUrl(Uri.parse("https://shetravel.com/apply")),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ExploreToursScreen()),
-              );
+              context.router.push(SignupRoute());
             },
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),

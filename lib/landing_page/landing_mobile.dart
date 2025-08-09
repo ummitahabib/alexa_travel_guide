@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,6 +14,7 @@ import 'package:she_travel/memories_section.dart';
 import 'package:she_travel/she_travel_web.dart';
 import 'package:she_travel/upcoming_tour.dart';
 import 'package:she_travel/utils/route.dart';
+import 'package:she_travel/utils/route.gr.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:animate_do/animate_do.dart';
@@ -59,25 +61,31 @@ class _LandingPageState extends State<LandingPage> {
   @override
   Widget build(BuildContext context) {
     const String assetName = 'assets/she_travel.svg';
-    final Widget svg = SvgPicture.asset(assetName, semanticsLabel: 'App Logo');
+    final Widget svg = SvgPicture.asset(
+      assetName,
+      semanticsLabel: 'App Logo',
+      color: Colors.black,
+    );
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: IconThemeData(color: Colors.pink.shade100),
-        title: Row(
-          children: [
-            SizedBox(
-              height: 40,
-              child: SvgPicture.asset(
-                assetName,
-                semanticsLabel: 'App Logo',
-                color: Colors.pink.shade100,
-              ),
+
+        actions: [
+          SizedBox(),
+
+          Spacer(),
+
+          SizedBox(
+            height: 40,
+            child: SvgPicture.asset(
+              assetName,
+              semanticsLabel: 'App Logo',
+              color: Colors.pink.shade100,
             ),
-            SizedBox(width: 10),
-          ],
-        ),
+          ),
+        ],
       ),
 
       drawer: Drawer(
@@ -101,6 +109,22 @@ class _LandingPageState extends State<LandingPage> {
             _drawerItem('Safety', 'safety'),
             _drawerItem('Past Trips', 'past'),
             _drawerItem('Get In Touch', 'getInTouch'),
+
+            SizedBox(height: 20),
+
+            ListTile(
+              title: Text(
+                'Login',
+                style: GoogleFonts.poppins(
+                  fontSize: 15,
+                  color: Colors.pink.shade100,
+                ),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                context.router.push(LoginRoute());
+              },
+            ),
           ],
         ),
       ),
@@ -604,7 +628,6 @@ class _LandingPageState extends State<LandingPage> {
     );
   }
 
-
   Widget _buildMemoryCard(BuildContext context, PastTrip trip) {
     return GestureDetector(
       onTap: () {
@@ -831,8 +854,7 @@ class _LandingPageState extends State<LandingPage> {
       scrollDirection: Axis.horizontal,
       padding: EdgeInsets.symmetric(horizontal: 16),
       child: Row(
-        children:
-            pastTrips.map((trip) => pastTripCard(context, trip)).toList(),
+        children: pastTrips.map((trip) => pastTripCard(context, trip)).toList(),
       ),
     );
   }
