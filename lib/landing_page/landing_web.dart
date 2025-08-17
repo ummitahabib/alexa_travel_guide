@@ -346,65 +346,60 @@ class _LandingPageWebState extends ConsumerState<LandingPageWeb> {
     return Row(
       children: [
         // Dismiss button
-        Expanded(
-          child: OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(color: Colors.grey.shade300),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 14),
+        OutlinedButton(
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: Colors.grey.shade300),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-            onPressed: () {
-              if (mounted) {
-                Navigator.of(context).pop();
-              }
-            },
-            child: Text(
-              'Maybe Later',
-              style: GoogleFonts.poppins(
-                color: Colors.grey.shade700,
-                fontWeight: FontWeight.w500,
-              ),
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+          ),
+          onPressed: () {
+            if (mounted) {
+              Navigator.of(context).pop();
+            }
+          },
+          child: Text(
+            'Skip',
+            style: GoogleFonts.poppins(
+              color: Colors.grey.shade700,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
         const SizedBox(width: 12),
 
         // View all button
-        Expanded(
-          flex: 2,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.pink.shade400,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shadowColor: Colors.transparent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 14),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.pink.shade400,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            shadowColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-            onPressed: () {
-              if (mounted) {
-                Navigator.of(context).pop();
-                _navigateToEvents();
-              }
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.explore, size: 18),
-                const SizedBox(width: 8),
-                Text(
-                  'VIEW ALL EVENTS',
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+          ),
+          onPressed: () {
+            if (mounted) {
+              Navigator.of(context).pop();
+           //   _navigateToEvents();
+            }
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.explore, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                'VIEW ALL',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ],
@@ -413,33 +408,14 @@ class _LandingPageWebState extends ConsumerState<LandingPageWeb> {
 
   void _navigateToEvents() {
     try {
-      // Try using auto_route first
-      if (context.router != null) {
-        context.router.pushNamed('/events'); // Adjust route name as needed
-      } else {
-        // Fallback to regular navigation
-        _navigateToEventsSection();
-      }
+Navigator.of(context).pop();
+   
+  
     } catch (e) {
-      // If auto_route fails, use fallback
-      _navigateToEventsSection();
+   Navigator.of(context).pop();
     }
   }
 
-  void _navigateToEventsSection() {
-    // Alternative navigation methods
-    try {
-      // Option 1: If you have a named route
-      Navigator.of(context).pushNamed('/events');
-    } catch (e) {
-      // Option 2: If you have a specific widget to navigate to
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (context) => Container()));
-    }
-  }
-
-  // Helper functions to safely extract event data
   String? _getEventImageUrl(dynamic event) {
     if (event == null) return null;
     return event.imageUrl?.toString() ?? event.image?.toString();

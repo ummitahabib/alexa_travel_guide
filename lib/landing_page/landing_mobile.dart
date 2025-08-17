@@ -353,7 +353,7 @@ class _LandingPageState extends ConsumerState<LandingPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              padding: const EdgeInsets.symmetric(vertical: 14),
+               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
             ),
             onPressed: () {
               if (mounted) {
@@ -361,7 +361,7 @@ class _LandingPageState extends ConsumerState<LandingPage> {
               }
             },
             child: Text(
-              'Maybe Later',
+              'Skip',
               style: GoogleFonts.poppins(
                 color: Colors.grey.shade700,
                 fontWeight: FontWeight.w500,
@@ -383,12 +383,12 @@ class _LandingPageState extends ConsumerState<LandingPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              padding: const EdgeInsets.symmetric(vertical: 14),
+               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
             ),
             onPressed: () {
               if (mounted) {
                 Navigator.of(context).pop();
-                _navigateToEvents();
+              //  _navigateToEvents();
               }
             },
             child: Row(
@@ -397,7 +397,7 @@ class _LandingPageState extends ConsumerState<LandingPage> {
                 Icon(Icons.explore, size: 18),
                 const SizedBox(width: 8),
                 Text(
-                  'VIEW ALL EVENTS',
+                  'VIEW ALL',
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -413,33 +413,13 @@ class _LandingPageState extends ConsumerState<LandingPage> {
 
   void _navigateToEvents() {
     try {
-      // Try using auto_route first
-      if (context.router != null) {
-        context.router.pushNamed('/events'); // Adjust route name as needed
-      } else {
-        // Fallback to regular navigation
-        _navigateToEventsSection();
-      }
+Navigator.of(context).pop();
+   
+  
     } catch (e) {
-      // If auto_route fails, use fallback
-      _navigateToEventsSection();
+   Navigator.of(context).pop();
     }
   }
-
-  void _navigateToEventsSection() {
-    // Alternative navigation methods
-    try {
-      // Option 1: If you have a named route
-      Navigator.of(context).pushNamed('/events');
-    } catch (e) {
-      // Option 2: If you have a specific widget to navigate to
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (context) => Container()));
-    }
-  }
-
-  // Helper functions to safely extract event data
   String? _getEventImageUrl(dynamic event) {
     if (event == null) return null;
     return event.imageUrl?.toString() ?? event.image?.toString();
