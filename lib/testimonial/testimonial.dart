@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shetravels/she_travel_web.dart';
+
+import 'package:shetravels/testimonial/data/testimonial_repository.dart';
+
+import 'data/model/testimonial.dart';
 
 Widget buildTestimonialCard(Testimonial t) {
   return Card(
@@ -42,29 +45,43 @@ Widget buildTestimonialCard(Testimonial t) {
   );
 }
 
-Widget buildTestimonialSection(BuildContext context) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Text(
-          "What Travellers Say",
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
-        ),
+class TestimonialListPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("What Travellers Say")),
+      body: 
+      
+      StreamBuilder<List<Testimonial>>(
+        stream: TestimonialRepository.getTestimonialsStream(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text("No testimonials yet."));
+          }
+          final testimonials = snapshot.data!;
+          return ListView.builder(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            itemCount: testimonials.length,
+            itemBuilder: (context, index) {
+              return buildTestimonialCard(testimonials[index]);
+            },
+          );
+        },
       ),
-      SizedBox(
-        height: 500,
-        child: ListView.builder(
-          scrollDirection: Axis.vertical,
-          itemCount: testimonials.length,
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          itemBuilder: (context, index) {
-            return buildTestimonialCard(testimonials[index]);
-          },
-        ),
+     
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add_comment),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => Container()),
+            //AddTestimonialPage()),
+          );
+        },
       ),
-    ],
-  );
+    );
+  }
 }

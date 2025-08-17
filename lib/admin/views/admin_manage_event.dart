@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../data/event_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -168,715 +169,569 @@ class _AdminManageEventScreenState extends State<AdminManageEventScreen>
     }
   }
 
-  void _showAddDialog() {
-    final titleController = TextEditingController();
-    final dateController = TextEditingController();
-    final descController = TextEditingController();
-    final locationController = TextEditingController();
-    final priceController = TextEditingController();
 
-    Uint8List? imageBytes;
-    String? imagePath;
-    String? imageUrl;
-    bool isUploading = false;
+void _showAddDialog() {
+  final titleController = TextEditingController();
+  final dateController = TextEditingController();
+  final descController = TextEditingController();
+  final locationController = TextEditingController();
+  final priceController = TextEditingController();
 
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(0.7),
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return StatefulBuilder(
-          builder:
-              (context, setStateDialog) => AnimatedBuilder(
-                animation: animation,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: animation.value,
-                    child: Dialog(
-                      backgroundColor: Colors.transparent,
-                      child: Container(
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.9,
-                          maxHeight: MediaQuery.of(context).size.height * 0.85,
+  Uint8List? imageBytes; // unified for web & mobile
+  String? imageUrl;      // uploaded url
+  bool isUploading = false;
+
+  showGeneralDialog(
+    context: context,
+    barrierDismissible: false,
+    barrierColor: Colors.black.withOpacity(0.7),
+    transitionDuration: const Duration(milliseconds: 300),
+    pageBuilder: (context, animation, secondaryAnimation) {
+      return StatefulBuilder(
+        builder: (context, setStateDialog) => AnimatedBuilder(
+          animation: animation,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: animation.value,
+              child: Dialog(
+                backgroundColor: Colors.transparent,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final screen = MediaQuery.of(context).size;
+                    final maxWidth = screen.width >= 900
+                        ? 720.0
+                        : screen.width * 0.92; // responsive width
+                    final maxHeight = screen.height * 0.88;
+
+                    return Container(
+                      constraints: BoxConstraints(
+                        maxWidth: maxWidth,
+                        maxHeight: maxHeight,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Colors.white, Colors.purple.shade50],
                         ),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Colors.white, Colors.purple.shade50],
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.purple.withOpacity(0.3),
+                            blurRadius: 30,
+                            spreadRadius: 5,
                           ),
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.purple.withOpacity(0.3),
-                              blurRadius: 30,
-                              spreadRadius: 5,
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(24),
-                          child: Column(
-                            children: [
-                              // Header
-                              Container(
-                                padding: const EdgeInsets.all(24),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Colors.purple.shade600,
-                                      Colors.deepPurple.shade700,
-                                    ],
-                                  ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(24),
+                        child: Column(
+                          children: [
+                            // ===== Header =====
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.purple.shade600,
+                                    Colors.deepPurple.shade700,
+                                  ],
                                 ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.2),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: const Icon(
-                                        Icons.event_available,
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Icon(
+                                      Icons.event_available,
+                                      color: Colors.white,
+                                      size: 24,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  const Expanded(
+                                    child: Text(
+                                      "Create New Event",
+                                      style: TextStyle(
                                         color: Colors.white,
-                                        size: 24,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    const SizedBox(width: 16),
-                                    const Expanded(
-                                      child: Text(
-                                        "Create New Event",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
+                                  ),
+                                  IconButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    icon: const Icon(Icons.close, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // ===== Content =====
+                            Expanded(
+                              child: SingleChildScrollView(
+                                padding: const EdgeInsets.all(24),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _buildModernTextField(
+                                      controller: titleController,
+                                      label: "Event Title",
+                                      icon: Icons.title,
+                                      hint: "Enter event name",
+                                    ),
+                                    const SizedBox(height: 20),
+
+                                    // Date (Calendar Picker)
+                                    GestureDetector(
+                                      onTap: () async {
+                                        final pickedDate = await showDatePicker(
+                                          context: context,
+                                          initialDate: DateTime.now(),
+                                          firstDate: DateTime(2020),
+                                          lastDate: DateTime(2100),
+                                          helpText: 'Select event date',
+                                          builder: (context, child) {
+                                            // Make date picker responsive on large screens
+                                            return Center(
+                                              child: ConstrainedBox(
+                                                constraints: const BoxConstraints(maxWidth: 400),
+                                                child: child!,
+                                              ),
+                                            );
+                                          },
+                                        );
+                                        if (pickedDate != null) {
+                                          setStateDialog(() {
+                                            dateController.text = DateFormat.yMMMd().format(pickedDate);
+                                          });
+                                        }
+                                      },
+                                      child: AbsorbPointer(
+                                        child: _buildModernTextField(
+                                          controller: dateController,
+                                          label: "Event Date",
+                                          icon: Icons.calendar_today,
+                                          hint: "Select date",
                                         ),
                                       ),
                                     ),
-                                    IconButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      icon: const Icon(
-                                        Icons.close,
-                                        color: Colors.white,
+                                    const SizedBox(height: 20),
+
+                                    _buildModernTextField(
+                                      controller: locationController,
+                                      label: "Location",
+                                      icon: Icons.location_on,
+                                      hint: "Event venue",
+                                    ),
+                                    const SizedBox(height: 20),
+
+                                    _buildModernTextField(
+                                      controller: priceController,
+                                      label: "Price (USD)",
+                                      icon: Icons.attach_money,
+                                      hint: "0.00",
+                                      keyboardType: TextInputType.number,
+                                    ),
+                                    const SizedBox(height: 20),
+
+                                    _buildModernTextField(
+                                      controller: descController,
+                                      label: "Description",
+                                      icon: Icons.description,
+                                      hint: "Event details",
+                                      maxLines: 3,
+                                    ),
+                                    const SizedBox(height: 24),
+
+                                    // ===== Image Upload Section (Web-safe) =====
+                                    Container(
+                                      padding: const EdgeInsets.all(20),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.blue.shade50,
+                                            Colors.purple.shade50,
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(
+                                          color: Colors.purple.shade200,
+                                          width: 2,
+                                        ),
                                       ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Event Image",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.purple.shade700,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 16),
+
+                                          // Preview (uses bytes or uploaded URL)
+                                          _buildImagePreview(imageBytes, imageUrl),
+                                          const SizedBox(height: 16),
+
+                                          // Buttons
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: _buildModernButton(
+                                                  onPressed: isUploading
+                                                      ? null
+                                                      : () async {
+                                                          final picker = ImagePicker();
+                                                          final picked = await picker.pickImage(
+                                                            source: ImageSource.gallery,
+                                                            maxWidth: 1024,
+                                                            maxHeight: 1024,
+                                                            imageQuality: 85,
+                                                          );
+                                                          if (picked == null) return;
+                                                          final bytes = await picked.readAsBytes();
+                                                          setStateDialog(() {
+                                                            imageBytes = bytes;
+                                                            imageUrl = null; // reset previous upload
+                                                          });
+                                                        },
+                                                  icon: Icons.photo_library,
+                                                  label: "Select",
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Expanded(
+                                                child: _buildModernButton(
+                                                  onPressed: isUploading || imageBytes == null
+                                                      ? null
+                                                      : () async {
+                                                          setStateDialog(() => isUploading = true);
+                                                          final uploadedUrl = await _uploadImage(bytes: imageBytes);
+                                                          setStateDialog(() {
+                                                            isUploading = false;
+                                                            if (uploadedUrl != null) {
+                                                              imageUrl = uploadedUrl;
+                                                              imageBytes = null; // clear local selection
+                                                            }
+                                                          });
+                                                        },
+                                                  icon: isUploading ? null : Icons.cloud_upload,
+                                                  label: isUploading ? "Uploading..." : "Upload",
+                                                  color: Colors.purple,
+                                                  isLoading: isUploading,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+
+                                          if (imageUrl != null)
+                                            Container(
+                                              margin: const EdgeInsets.only(top: 12),
+                                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                              decoration: BoxDecoration(
+                                                color: Colors.green.shade100,
+                                                borderRadius: BorderRadius.circular(20),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(Icons.check_circle, color: Colors.green.shade600, size: 18),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    "Image uploaded successfully!",
+                                                    style: TextStyle(
+                                                      color: Colors.green.shade700,
+                                                      fontWeight: FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    const SizedBox(height: 32),
+
+                                    // ===== Actions =====
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: OutlinedButton(
+                                            onPressed: () => Navigator.pop(context),
+                                            style: OutlinedButton.styleFrom(
+                                              padding: const EdgeInsets.symmetric(vertical: 16),
+                                              side: BorderSide(color: Colors.grey.shade400),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                            ),
+                                            child: const Text(
+                                              "Cancel",
+                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          flex: 2,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  Colors.purple.shade600,
+                                                  Colors.deepPurple.shade700,
+                                                ],
+                                              ),
+                                              borderRadius: BorderRadius.circular(12),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.purple.withOpacity(0.4),
+                                                  blurRadius: 8,
+                                                  offset: const Offset(0, 4),
+                                                ),
+                                              ],
+                                            ),
+                                            child: ElevatedButton(
+                                              onPressed: isUploading
+                                                  ? null
+                                                  : () async {
+                                                      if (titleController.text.trim().isEmpty) {
+                                                        _showErrorSnackBar("Please enter a title");
+                                                        return;
+                                                      }
+                                                      if (dateController.text.trim().isEmpty) {
+                                                        _showErrorSnackBar("Please select a date");
+                                                        return;
+                                                      }
+                                                      if (imageUrl == null) {
+                                                        _showErrorSnackBar("Please upload an image");
+                                                        return;
+                                                      }
+                                                      final priceText = priceController.text.trim();
+                                                      if (priceText.isEmpty || double.tryParse(priceText) == null) {
+                                                        _showErrorSnackBar("Please enter a valid price");
+                                                        return;
+                                                      }
+
+                                                      final priceInCents = (double.parse(priceText) * 100).toInt();
+
+                                                      final newEvent = Event(
+                                                        title: titleController.text.trim(),
+                                                        date: dateController.text.trim(),
+                                                        description: descController.text.trim(),
+                                                        location: locationController.text.trim(),
+                                                        price: priceInCents,
+                                                        imageUrl: imageUrl!,
+                                                      );
+
+                                                      Navigator.pop(context);
+                                                      await _addEvent(newEvent);
+                                                    },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.transparent,
+                                                shadowColor: Colors.transparent,
+                                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(12),
+                                                ),
+                                              ),
+                                              child: const Text(
+                                                "Create Event",
+                                                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
                               ),
-
-                              // Content
-                              Expanded(
-                                child: SingleChildScrollView(
-                                  padding: const EdgeInsets.all(24),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // Title Field
-                                      _buildModernTextField(
-                                        controller: titleController,
-                                        label: "Event Title",
-                                        icon: Icons.title,
-                                        hint: "Enter event name",
-                                      ),
-
-                                      const SizedBox(height: 20),
-
-                                      // Date Field
-                                      _buildModernTextField(
-                                        controller: dateController,
-                                        label: "Event Date",
-                                        icon: Icons.calendar_today,
-                                        hint: "Select date",
-                                      ),
-
-                                      const SizedBox(height: 20),
-
-                                      // Location Field
-                                      _buildModernTextField(
-                                        controller: locationController,
-                                        label: "Location",
-                                        icon: Icons.location_on,
-                                        hint: "Event venue",
-                                      ),
-
-                                      const SizedBox(height: 20),
-
-                                      // Price Field
-                                      _buildModernTextField(
-                                        controller: priceController,
-                                        label: "Price (USD)",
-                                        icon: Icons.attach_money,
-                                        hint: "0.00",
-                                        keyboardType: TextInputType.number,
-                                      ),
-
-                                      const SizedBox(height: 20),
-
-                                      // Description Field
-                                      _buildModernTextField(
-                                        controller: descController,
-                                        label: "Description",
-                                        icon: Icons.description,
-                                        hint: "Event details",
-                                        maxLines: 3,
-                                      ),
-
-                                      const SizedBox(height: 24),
-
-                                      // Image Upload Section
-                                      Container(
-                                        padding: const EdgeInsets.all(20),
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              Colors.blue.shade50,
-                                              Colors.purple.shade50,
-                                            ],
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            16,
-                                          ),
-                                          border: Border.all(
-                                            color: Colors.purple.shade200,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        child: Column(
-                                          children: [
-                                            Text(
-                                              "Event Image",
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.purple.shade700,
-                                              ),
-                                            ),
-
-                                            const SizedBox(height: 16),
-
-                                            // Image Preview
-                                            _buildImagePreview(
-                                              imageBytes,
-                                              imagePath,
-                                              imageUrl,
-                                            ),
-
-                                            const SizedBox(height: 16),
-
-                                            // Upload Buttons
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: _buildModernButton(
-                                                    onPressed:
-                                                        isUploading
-                                                            ? null
-                                                            : () async {
-                                                              final picker =
-                                                                  ImagePicker();
-                                                              final picked = await picker
-                                                                  .pickImage(
-                                                                    source:
-                                                                        ImageSource
-                                                                            .gallery,
-                                                                    maxWidth:
-                                                                        1024,
-                                                                    maxHeight:
-                                                                        1024,
-                                                                    imageQuality:
-                                                                        85,
-                                                                  );
-
-                                                              if (picked ==
-                                                                  null)
-                                                                return;
-
-                                                              if (kIsWeb) {
-                                                                final bytes =
-                                                                    await picked
-                                                                        .readAsBytes();
-                                                                setStateDialog(
-                                                                  () {
-                                                                    imageBytes =
-                                                                        bytes;
-                                                                    imagePath =
-                                                                        null;
-                                                                    imageUrl =
-                                                                        null;
-                                                                  },
-                                                                );
-                                                              } else {
-                                                                setStateDialog(
-                                                                  () {
-                                                                    imagePath =
-                                                                        picked
-                                                                            .path;
-                                                                    imageBytes =
-                                                                        null;
-                                                                    imageUrl =
-                                                                        null;
-                                                                  },
-                                                                );
-                                                              }
-                                                            },
-                                                    icon: Icons.photo_library,
-                                                    label: "Select",
-                                                    color: Colors.blue,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 12),
-                                                Expanded(
-                                                  child: _buildModernButton(
-                                                    onPressed:
-                                                        isUploading ||
-                                                                (imageBytes ==
-                                                                        null &&
-                                                                    imagePath ==
-                                                                        null)
-                                                            ? null
-                                                            : () async {
-                                                              setStateDialog(
-                                                                () =>
-                                                                    isUploading =
-                                                                        true,
-                                                              );
-
-                                                              final uploadedUrl =
-                                                                  await _uploadImage(
-                                                                    bytes:
-                                                                        imageBytes,
-                                                                    filePath:
-                                                                        imagePath,
-                                                                  );
-
-                                                              setStateDialog(() {
-                                                                isUploading =
-                                                                    false;
-                                                                if (uploadedUrl !=
-                                                                    null) {
-                                                                  imageUrl =
-                                                                      uploadedUrl;
-                                                                  imageBytes =
-                                                                      null;
-                                                                  imagePath =
-                                                                      null;
-                                                                }
-                                                              });
-                                                            },
-                                                    icon:
-                                                        isUploading
-                                                            ? null
-                                                            : Icons
-                                                                .cloud_upload,
-                                                    label:
-                                                        isUploading
-                                                            ? "Uploading..."
-                                                            : "Upload",
-                                                    color: Colors.purple,
-                                                    isLoading: isUploading,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-
-                                            if (imageUrl != null)
-                                              Container(
-                                                margin: const EdgeInsets.only(
-                                                  top: 12,
-                                                ),
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 16,
-                                                      vertical: 8,
-                                                    ),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.green.shade100,
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                ),
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    Icon(
-                                                      Icons.check_circle,
-                                                      color:
-                                                          Colors.green.shade600,
-                                                      size: 18,
-                                                    ),
-                                                    const SizedBox(width: 8),
-                                                    Text(
-                                                      "Image uploaded successfully!",
-                                                      style: TextStyle(
-                                                        color:
-                                                            Colors
-                                                                .green
-                                                                .shade700,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-
-                                      const SizedBox(height: 32),
-
-                                      // Action Buttons
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: OutlinedButton(
-                                              onPressed:
-                                                  () => Navigator.pop(context),
-                                              style: OutlinedButton.styleFrom(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      vertical: 16,
-                                                    ),
-                                                side: BorderSide(
-                                                  color: Colors.grey.shade400,
-                                                ),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                ),
-                                              ),
-                                              child: const Text(
-                                                "Cancel",
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 16),
-                                          Expanded(
-                                            flex: 2,
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    Colors.purple.shade600,
-                                                    Colors.deepPurple.shade700,
-                                                  ],
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.purple
-                                                        .withOpacity(0.4),
-                                                    blurRadius: 8,
-                                                    offset: const Offset(0, 4),
-                                                  ),
-                                                ],
-                                              ),
-                                              child: ElevatedButton(
-                                                onPressed:
-                                                    isUploading
-                                                        ? null
-                                                        : () async {
-                                                          if (titleController
-                                                              .text
-                                                              .trim()
-                                                              .isEmpty) {
-                                                            _showErrorSnackBar(
-                                                              "Please enter a title",
-                                                            );
-                                                            return;
-                                                          }
-                                                          if (imageUrl ==
-                                                              null) {
-                                                            _showErrorSnackBar(
-                                                              "Please upload an image",
-                                                            );
-                                                            return;
-                                                          }
-
-                                                          final priceText =
-                                                              priceController
-                                                                  .text
-                                                                  .trim();
-                                                          if (priceText
-                                                                  .isEmpty ||
-                                                              double.tryParse(
-                                                                    priceText,
-                                                                  ) ==
-                                                                  null) {
-                                                            _showErrorSnackBar(
-                                                              "Please enter a valid price",
-                                                            );
-                                                            return;
-                                                          }
-
-                                                          final priceInCents =
-                                                              (double.parse(
-                                                                        priceText,
-                                                                      ) *
-                                                                      100)
-                                                                  .toInt();
-
-                                                          final newEvent = Event(
-                                                            title:
-                                                                titleController
-                                                                    .text
-                                                                    .trim(),
-                                                            date:
-                                                                dateController
-                                                                    .text
-                                                                    .trim(),
-                                                            description:
-                                                                descController
-                                                                    .text
-                                                                    .trim(),
-                                                            location:
-                                                                locationController
-                                                                    .text
-                                                                    .trim(),
-                                                            price: priceInCents,
-                                                            imageUrl: imageUrl!,
-                                                          );
-
-                                                          Navigator.pop(
-                                                            context,
-                                                          );
-                                                          await _addEvent(
-                                                            newEvent,
-                                                          );
-                                                        },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      Colors.transparent,
-                                                  shadowColor:
-                                                      Colors.transparent,
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        vertical: 16,
-                                                      ),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          12,
-                                                        ),
-                                                  ),
-                                                ),
-                                                child: const Text(
-                                                  "Create Event",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
+            );
+          },
+        ),
+      );
+    },
+  );
+}
+
+// ===== Helpers =====
+Widget _buildModernTextField({
+  required TextEditingController controller,
+  required String label,
+  required IconData icon,
+  String? hint,
+  int maxLines = 1,
+  TextInputType? keyboardType,
+}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Colors.grey.shade700,
+        ),
+      ),
+      const SizedBox(height: 8),
+      TextField(
+        controller: controller,
+        maxLines: maxLines,
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          prefixIcon: Icon(icon, color: Colors.purple.shade400),
+          hintText: hint,
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.purple.shade100, width: 1.5),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.purple.shade400, width: 1.5),
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+// REFACTORED: Web-safe image preview (bytes or URL). No dart:io File usage.
+Widget _buildImagePreview(
+  Uint8List? imageBytes,
+  String? imageUrl,
+) {
+  Widget imageWidget;
+
+  if (imageBytes != null) {
+    imageWidget = Image.memory(imageBytes, fit: BoxFit.cover);
+  } else if (imageUrl != null) {
+    imageWidget = Image.network(
+      imageUrl,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return Container(
+          color: Colors.grey.shade200,
+          child: const Icon(Icons.error, color: Colors.grey),
+        );
+      },
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          color: Colors.grey.shade200,
+          child: Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded /
+                      loadingProgress.expectedTotalBytes!
+                  : null,
+            ),
+          ),
         );
       },
     );
-  }
-
-  Widget _buildModernTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    required String hint,
-    TextInputType? keyboardType,
-    int maxLines = 1,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: Colors.purple.shade700,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Colors.purple.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: TextField(
-            controller: controller,
-            keyboardType: keyboardType,
-            maxLines: maxLines,
-            decoration: InputDecoration(
-              hintText: hint,
-              prefixIcon: Icon(icon, color: Colors.purple.shade400),
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.purple.shade200),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.purple.shade200),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.purple.shade400, width: 2),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildImagePreview(
-    Uint8List? imageBytes,
-    String? imagePath,
-    String? imageUrl,
-  ) {
-    Widget imageWidget;
-
-    if (imageBytes != null) {
-      imageWidget = Image.memory(imageBytes, fit: BoxFit.cover);
-    } else if (imagePath != null) {
-      imageWidget = Image.file(File(imagePath), fit: BoxFit.cover);
-    } else if (imageUrl != null) {
-      imageWidget = Image.network(
-        imageUrl,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            color: Colors.grey.shade200,
-            child: const Icon(Icons.error, color: Colors.grey),
-          );
-        },
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Container(
-            color: Colors.grey.shade200,
-            child: Center(
-              child: CircularProgressIndicator(
-                value:
-                    loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
-                color: Colors.purple,
-              ),
-            ),
-          );
-        },
-      );
-    } else {
-      imageWidget = Container(
-        color: Colors.grey.shade100,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.image, size: 48, color: Colors.grey.shade400),
-            const SizedBox(height: 8),
-            Text(
-              "No image selected",
-              style: TextStyle(color: Colors.grey.shade600),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Container(
-      height: 150,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.purple.shade200),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: imageWidget,
-      ),
-    );
-  }
-
-  Widget _buildModernButton({
-    required VoidCallback? onPressed,
-    IconData? icon,
-    required String label,
-    required Color color,
-    bool isLoading = false,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-        ),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.3),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
+  } else {
+    imageWidget = Container(
+      color: Colors.grey.shade100,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.image, size: 48, color: Colors.grey.shade400),
+          const SizedBox(height: 8),
+          Text(
+            "No image selected",
+            style: TextStyle(color: Colors.grey.shade600),
           ),
         ],
       ),
-      child: ElevatedButton.icon(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        icon:
-            isLoading
-                ? const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  ),
-                )
-                : Icon(icon, color: Colors.white, size: 18),
-        label: Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
     );
   }
+
+  return Container(
+    height: 150,
+    width: double.infinity,
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: Colors.purple.shade200),
+    ),
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: imageWidget,
+    ),
+  );
+}
+
+// Your existing modern button API preserved
+Widget _buildModernButton({
+  required VoidCallback? onPressed,
+  IconData? icon,
+  required String label,
+  required Color color,
+  bool isLoading = false,
+}) {
+  return Container(
+    decoration: BoxDecoration(
+      gradient: const LinearGradient(
+        colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+      ),
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: color.withOpacity(0.3),
+          blurRadius: 6,
+          offset: const Offset(0, 3),
+        ),
+      ],
+    ),
+    child: ElevatedButton.icon(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.transparent,
+        shadowColor: Colors.transparent,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      icon: isLoading
+          ? const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Icon(icon, color: Colors.white, size: 18),
+      label: Text(
+        label,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    ),
+  );
+}
 
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -1033,49 +888,7 @@ class _AdminManageEventScreenState extends State<AdminManageEventScreen>
                                   onPressed: _isLoading ? null : _showAddDialog,
                                 ),
                               ),
-                            
-                              // PopupMenuButton<String>(
-                              //   icon: Container(
-                              //     padding: const EdgeInsets.all(8),
-                              //     decoration: BoxDecoration(
-                              //       color: Colors.white.withOpacity(0.1),
-                              //       borderRadius: BorderRadius.circular(12),
-                              //     ),
-                              //     child: const Icon(
-                              //       Icons.add,
-                              //       color: Colors.white,
-                              //     ),
-                              //   ),
-                              //   onSelected: (value) async {
-                              //     if (value == 'logout') {
-                              //       await _auth.signOut();
-                              //       setState(() {
-                              //         _currentUser = null;
-                              //         events = [];
-                              //       });
-                              //       _showSuccessSnackBar(
-                              //         'Signed out successfully',
-                              //       );
-                              //     }
-                              //   },
-                              //   itemBuilder:
-                              //       (context) => [
-                              //         PopupMenuItem(
-                              //           value: 'logout',
-                              //           child: Row(
-                              //             children: [
-                              //               const Icon(Icons.logout),
-                              //               const SizedBox(width: 8),
-                              //               Text(
-                              //                 'Sign Out (${_currentUser?.uid?.substring(0, 8) ?? 'N/A'})',
-                              //               ),
-                              //             ],
-                              //           ),
-                              //         ),
-                              //       ],
-                              // ),
-                          
-                          
+                     
                             ],
                           ),
                         ],
@@ -1113,7 +926,7 @@ class _AdminManageEventScreenState extends State<AdminManageEventScreen>
                 ),
               ),
 
-              // Body Content
+     
               Expanded(
                 child:
                     _isLoading
@@ -1342,7 +1155,9 @@ class _AdminManageEventScreenState extends State<AdminManageEventScreen>
                             ),
                           ),
                         )
-                        : RefreshIndicator(
+                        : 
+                    
+                        RefreshIndicator(
                           onRefresh: _loadEvents,
                           color: Colors.purple,
                           child: Padding(
@@ -1374,6 +1189,8 @@ class _AdminManageEventScreenState extends State<AdminManageEventScreen>
                                     ),
                           ),
                         ),
+             
+             
               ),
             ],
           ),
@@ -1483,227 +1300,205 @@ class _AdminManageEventScreenState extends State<AdminManageEventScreen>
     );
   }
 
-  Widget _buildEventCard(Event event, int index) {
-    final isMobile = MediaQuery.of(context).size.width < 500;
+Widget _buildEventCard(Event event, int index) {
+  final size = MediaQuery.of(context).size;
+  final isMobile = size.width < 600; // mobile vs tablet/desktop
 
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 300 + (index * 100)),
-      curve: Curves.easeOutBack,
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Colors.white, Colors.purple.shade50.withOpacity(0.5)],
-          ),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.purple.withOpacity(0.1),
-              blurRadius: 15,
-              spreadRadius: 2,
-              offset: const Offset(0, 5),
-            ),
+  return AnimatedContainer(
+    duration: Duration(milliseconds: 400 + (index * 120)),
+    curve: Curves.easeOutCubic,
+    margin: const EdgeInsets.only(bottom: 20),
+    child: Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          colors: [
+            Colors.white.withOpacity(0.85),
+            Colors.purple.shade50.withOpacity(0.6),
           ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: IntrinsicHeight(
-            child: Row(
-              children: [
-                // Event Image
-                Container(
-                  width: isMobile ? 80 : 100,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.purple.shade200, Colors.blue.shade200],
-                    ),
-                  ),
-                  child: ClipRRect(
-                    child: Image.network(
-                      event.imageUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.purple.shade100,
-                          child: const Icon(
-                            Icons.event,
-                            size: 40,
-                            color: Colors.purple,
-                          ),
-                        );
-                      },
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Container(
-                          color: Colors.purple.shade100,
-                          child: const Center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.purple,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: isMobile
+            ? _buildMobileLayout(event)
+            : _buildDesktopLayout(event),
+      ),
+    ),
+  );
+}
+
+/// Mobile: stacked layout
+Widget _buildMobileLayout(Event event) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _buildEventImage(event),
+      Padding(
+        padding: const EdgeInsets.all(16),
+        child: _buildEventDetails(event, isMobile: true),
+      ),
+    ],
+  );
+}
+
+/// Desktop/Tablet: side-by-side layout
+Widget _buildDesktopLayout(Event event) {
+  return Row(
+    children: [
+      Expanded(flex: 2, child: _buildEventImage(event)),
+      Expanded(
+        flex: 3,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: _buildEventDetails(event, isMobile: false),
+        ),
+      ),
+    ],
+  );
+}
+
+/// Event image with shimmer loading & fallback
+Widget _buildEventImage(Event event) {
+  return Stack(
+    children: [
+      AspectRatio(
+        aspectRatio: 16 / 9,
+        child: Image.network(
+          event.imageUrl,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          errorBuilder: (context, error, stack) => Container(
+            color: Colors.purple.shade100,
+            child: const Icon(Icons.event, size: 60, color: Colors.purple),
+          ),
+          loadingBuilder: (context, child, loading) {
+            if (loading == null) return child;
+            return Container(
+              color: Colors.purple.shade50,
+              child: const Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.purple,
                 ),
-
-                // Event Details
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.all(isMobile ? 12 : 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          event.title,
-                          style: TextStyle(
-                            fontSize: isMobile ? 16 : 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.purple.shade800,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-
-                        const SizedBox(height: 8),
-
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.blue.shade100,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.calendar_today,
-                                    size: 14,
-                                    color: Colors.blue.shade600,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    event.date,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.blue.shade600,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 6),
-
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.location_on,
-                              size: 16,
-                              color: Colors.orange.shade600,
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                event.location,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey.shade700,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        if (event.description.isNotEmpty) ...[
-                          const SizedBox(height: 6),
-                          Text(
-                            event.description,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey.shade600,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-
-                        const SizedBox(height: 8),
-
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.green.shade400,
-                                    Colors.green.shade600,
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                (event.price / 100).toStringAsFixed(2),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-
-                            const Spacer(),
-
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.red.shade50,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.delete_outline,
-                                  color: Colors.red.shade600,
-                                  size: 20,
-                                ),
-                                onPressed: () => _showDeleteConfirmation(event),
-                                constraints: const BoxConstraints(
-                                  minWidth: 40,
-                                  minHeight: 40,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+              ),
+            );
+          },
+        ),
+      ),
+      Positioned(
+        right: 12,
+        top: 12,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.green.shade600,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.green.shade200,
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Text(
+            "\$${(event.price / 100).toStringAsFixed(2)}",
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
       ),
-    );
-  }
+    ],
+  );
+}
+
+/// Event details section
+Widget _buildEventDetails(Event event, {required bool isMobile}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        event.title,
+        style: TextStyle(
+          fontSize: isMobile ? 18 : 22,
+          fontWeight: FontWeight.bold,
+          color: Colors.purple.shade800,
+        ),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+      const SizedBox(height: 8),
+      Row(
+        children: [
+          Icon(Icons.calendar_today, size: 16, color: Colors.blue.shade600),
+          const SizedBox(width: 6),
+          Text(
+            event.date,
+            style: TextStyle(
+              fontSize: isMobile ? 13 : 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.blue.shade600,
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 6),
+      Row(
+        children: [
+          Icon(Icons.location_on, size: 16, color: Colors.orange.shade600),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              event.location,
+              style: TextStyle(
+                fontSize: isMobile ? 13 : 14,
+                color: Colors.grey.shade700,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+      if (event.description.isNotEmpty) ...[
+        const SizedBox(height: 10),
+        Text(
+          event.description,
+          style: TextStyle(
+            fontSize: isMobile ? 13 : 14,
+            color: Colors.grey.shade600,
+          ),
+          maxLines: isMobile ? 3 : 4,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+      const SizedBox(height: 12),
+      Align(
+        alignment: Alignment.bottomRight,
+        child: IconButton(
+          icon: Icon(Icons.delete_outline, color: Colors.red.shade600, size: 22),
+          onPressed: () => _showDeleteConfirmation(event),
+          style: IconButton.styleFrom(
+            backgroundColor: Colors.red.shade50,
+            padding: const EdgeInsets.all(10),
+          ),
+        ),
+      ),
+    ],
+  );
+}
 
   void _showDeleteConfirmation(Event event) {
     showGeneralDialog(
@@ -1779,3 +1574,16 @@ class _AdminManageEventScreenState extends State<AdminManageEventScreen>
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

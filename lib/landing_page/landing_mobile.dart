@@ -4,6 +4,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shetravels/admin/data/controller/event_controller.dart';
 import 'package:shetravels/animation_section.dart';
 import 'package:shetravels/common/view/widgets/build_founder_section.dart';
 import 'package:shetravels/common/view/widgets/hero_video.dart';
@@ -20,12 +22,446 @@ import 'package:animate_do/animate_do.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
-class LandingPage extends StatefulWidget {
+class LandingPage extends StatefulHookConsumerWidget {
   @override
-  State<LandingPage> createState() => _LandingPageState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _LandingPageState();
 }
 
-class _LandingPageState extends State<LandingPage> {
+class _LandingPageState extends ConsumerState<LandingPage> {
+  bool _hasShownPopup = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Delay showing popup to allow widget tree to build completely
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !_hasShownPopup) {
+        _checkAndShowUpcomingEventsPopup();
+      }
+    });
+  }
+
+  void _checkAndShowUpcomingEventsPopup() {
+    if (!mounted || _hasShownPopup) return;
+
+    final eventAsync = ref.read(upcomingEventsProvider);
+
+    // Listen to the provider state
+    eventAsync.whenOrNull(
+      data: (events) {
+        if (events != null && events.isNotEmpty && mounted && !_hasShownPopup) {
+          _hasShownPopup = true;
+          _showUpcomingEventsPopup(events.first);
+        }
+      },
+    );
+  }
+
+  void _showUpcomingEventsPopup(dynamic event) {
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: _buildPopupContent(event),
+        );
+      },
+    );
+  }
+
+  Widget _buildPopupContent(dynamic event) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.95),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header with close button
+                _buildPopupHeader(),
+                const SizedBox(height: 16),
+
+                // Description
+                _buildPopupDescription(),
+                const SizedBox(height: 20),
+
+                // Event preview
+                _buildEventPreview(event),
+                const SizedBox(height: 24),
+
+                // Action buttons
+                _buildPopupActions(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPopupHeader() {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.pink.shade50,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            Icons.event_available,
+            color: Colors.pink.shade400,
+            size: 24,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            'Upcoming Events',
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey.shade800,
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: () {
+            if (mounted) {
+              Navigator.of(context).pop();
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(Icons.close, color: Colors.grey.shade600, size: 20),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPopupDescription() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.blue.withOpacity(0.1), width: 1),
+      ),
+      child: Text(
+        'Discover transformative experiences designed to nourish your soul, build sisterhood, and inspire personal growth through our carefully curated events.',
+        style: GoogleFonts.poppins(
+          fontSize: 14,
+          color: Colors.grey.shade700,
+          height: 1.5,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _buildEventPreview(dynamic event) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Colors.pink.shade50, Colors.purple.shade50],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.5), width: 1),
+      ),
+      child: Row(
+        children: [
+          // Event image
+          _buildEventImage(event),
+          const SizedBox(width: 16),
+
+          // Event details
+          Expanded(child: _buildEventDetails(event)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEventImage(dynamic event) {
+    final imageUrl = _getEventImageUrl(event);
+
+    return Container(
+      width: 60,
+      height: 60,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child:
+            imageUrl != null && imageUrl.isNotEmpty
+                ? Image.network(
+                  imageUrl,
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return _buildDefaultEventImage();
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Center(
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.pink.shade300,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                )
+                : _buildDefaultEventImage(),
+      ),
+    );
+  }
+
+  Widget _buildDefaultEventImage() {
+    return Container(
+      width: 60,
+      height: 60,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Colors.pink.shade300, Colors.purple.shade300],
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Icon(Icons.event, color: Colors.white, size: 24),
+    );
+  }
+
+  Widget _buildEventDetails(dynamic event) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _getEventTitle(event),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.grey.shade800,
+            height: 1.3,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Icon(Icons.calendar_today, size: 16, color: Colors.grey.shade600),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                _getEventDate(event),
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.w500,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        if (_getEventLocation(event) != null) ...[
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Icon(Icons.location_on, size: 16, color: Colors.grey.shade600),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  _getEventLocation(event)!,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    color: Colors.grey.shade600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildPopupActions() {
+    return Row(
+      children: [
+        // Dismiss button
+        Expanded(
+          child: OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: Colors.grey.shade300),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+            onPressed: () {
+              if (mounted) {
+                Navigator.of(context).pop();
+              }
+            },
+            child: Text(
+              'Maybe Later',
+              style: GoogleFonts.poppins(
+                color: Colors.grey.shade700,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+
+        // View all button
+        Expanded(
+          flex: 2,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.pink.shade400,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+            onPressed: () {
+              if (mounted) {
+                Navigator.of(context).pop();
+                _navigateToEvents();
+              }
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.explore, size: 18),
+                const SizedBox(width: 8),
+                Text(
+                  'VIEW ALL EVENTS',
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _navigateToEvents() {
+    try {
+      // Try using auto_route first
+      if (context.router != null) {
+        context.router.pushNamed('/events'); // Adjust route name as needed
+      } else {
+        // Fallback to regular navigation
+        _navigateToEventsSection();
+      }
+    } catch (e) {
+      // If auto_route fails, use fallback
+      _navigateToEventsSection();
+    }
+  }
+
+  void _navigateToEventsSection() {
+    // Alternative navigation methods
+    try {
+      // Option 1: If you have a named route
+      Navigator.of(context).pushNamed('/events');
+    } catch (e) {
+      // Option 2: If you have a specific widget to navigate to
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (context) => Container()));
+    }
+  }
+
+  // Helper functions to safely extract event data
+  String? _getEventImageUrl(dynamic event) {
+    if (event == null) return null;
+    return event.imageUrl?.toString() ?? event.image?.toString();
+  }
+
+  String _getEventTitle(dynamic event) {
+    if (event == null) return "Upcoming Event";
+    return event.title?.toString() ??
+        event.name?.toString() ??
+        "Upcoming Event";
+  }
+
+  String _getEventDate(dynamic event) {
+    if (event == null) return "Date TBA";
+    return event.date?.toString() ?? event.startDate?.toString() ?? "Date TBA";
+  }
+
+  String? _getEventLocation(dynamic event) {
+    if (event == null) return null;
+    return event.location?.toString() ?? event.venue?.toString();
+  }
+
   final ScrollController _scrollController = ScrollController();
   final Map<String, GlobalKey> _sectionKeys = {
     'home': GlobalKey(),
@@ -59,7 +495,24 @@ class _LandingPageState extends State<LandingPage> {
 
   @override
   Widget build(BuildContext context) {
-    const String assetName = 'assets/shetravels.svg';
+    ref.listen<AsyncValue>(upcomingEventsProvider, (previous, next) {
+      if (!_hasShownPopup && mounted) {
+        next.whenOrNull(
+          data: (events) {
+            if (events != null && events.isNotEmpty) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted && !_hasShownPopup) {
+                  _hasShownPopup = true;
+                  _showUpcomingEventsPopup(events.first);
+                }
+              });
+            }
+          },
+        );
+      }
+    });
+
+    const String assetName = 'assets/she_travel.svg';
     final Widget svg = SvgPicture.asset(
       assetName,
       semanticsLabel: 'App Logo',
@@ -159,18 +612,12 @@ class _LandingPageState extends State<LandingPage> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
-                      buildFounderSection(context),
+                      FounderSection(),
                     ],
                   ),
                 ),
 
-                // _keyedSection(
-                //   'upcoming',
-                //   FadeInUp(
-                //     duration: Duration(milliseconds: 600),
-                //     child: buildUpcomingEventsSection(),
-                //   ),
-                // ),
+            
                 _keyedSection('getInTouch', buildTestimonialSection(context)),
 
                 SizedBox(height: 50),
@@ -493,232 +940,6 @@ class _LandingPageState extends State<LandingPage> {
     );
   }
 
-  Widget _buildUpcomingTours() {
-    return Container(
-      color: Colors.black87,
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 40, horizontal: 16),
-      child: Column(
-        children: [
-          // Title
-          Text(
-            "Upcoming Tours",
-            style: GoogleFonts.poppins(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 12),
-          Text(
-            "Explore curated tours & retreats designed for women who seek soulful adventures.",
-            style: GoogleFonts.poppins(fontSize: 18, color: Colors.white70),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 30),
-
-          // Tour cards
-          SizedBox(
-            height: 380,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              itemCount: upcomingTours.length,
-              separatorBuilder: (_, __) => SizedBox(width: 16),
-              itemBuilder: (context, index) {
-                final tour = upcomingTours[index];
-                return _buildTourCard(context, tour);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTourCard(BuildContext context, UpcomingTour tour) {
-    return GestureDetector(
-      onTap: () {
-        // navigate to detail page
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => TourDetailPage(tour: tour)),
-        );
-      },
-      child: Container(
-        width: 300,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          image: DecorationImage(
-            image: AssetImage(tour.imageUrl),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Stack(
-          children: [
-            // Gradient overlay
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: [Colors.black.withOpacity(0.7), Colors.transparent],
-                  ),
-                ),
-              ),
-            ),
-            // Text content
-            Positioned(
-              bottom: 16,
-              left: 16,
-              right: 16,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    tour.title,
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    tour.date,
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: Colors.white70,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.pink.shade200,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 12,
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => TourDetailPage(tour: tour),
-                        ),
-                      );
-                    },
-                    child: Text("Read More"),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMemoryCard(BuildContext context, PastTrip trip) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => TripGalleryPage(trip: trip)),
-        );
-      },
-      child: Container(
-        width: 260,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 6,
-              color: Colors.black26,
-              offset: Offset(0, 4),
-            ),
-          ],
-          image: DecorationImage(
-            image: AssetImage(trip.coverImage),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Subtle overlay
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.center,
-                  colors: [Colors.black.withOpacity(0.6), Colors.transparent],
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 16,
-              left: 16,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    trip.title,
-                    style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    trip.date,
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: Colors.white70,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildApplySection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          "Apply for a Trip",
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 20),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          alignment: WrapAlignment.center,
-          children: [
-            _applyButton("Website", "https://shetravel.com/apply"),
-            _applyButton("Instagram", "https://instagram.com/shetravels"),
-            _applyButton("WhatsApp", "https://wa.me/1234567890"),
-          ],
-        ),
-      ],
-    );
-  }
-
   Widget _buildFooter() {
     return Container(
       width: double.infinity,
@@ -837,23 +1058,6 @@ class _LandingPageState extends State<LandingPage> {
             style: TextStyle(fontSize: 12, color: Colors.black54),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _applyButton(String label, String url) {
-    return ElevatedButton(
-      onPressed: () => launchUrl(Uri.parse(url)),
-      child: Text(label),
-    );
-  }
-
-  Widget _buildPastTripsSection(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: pastTrips.map((trip) => pastTripCard(context, trip)).toList(),
       ),
     );
   }

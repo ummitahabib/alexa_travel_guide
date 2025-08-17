@@ -27,8 +27,9 @@ class AppRouter extends RootStackRouter {
   AutoRoute(page: AdminManageEventRoute.page, path: RouteString.manageEvent),
     AutoRoute(page: AdminBookingDashboardRoute.page, path: RouteString.adminBookingDashboard),
  
-    
-    
+        AutoRoute(page: AddTestimonialRoute.page, path: RouteString.adminTestimonial),
+ 
+    //
     
   ];
 }

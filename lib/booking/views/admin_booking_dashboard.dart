@@ -75,52 +75,53 @@ class _AdminBookingDashboardScreenState
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              // Custom Animated Header
-              SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, -1),
-                  end: Offset.zero,
-                ).animate(
-                  CurvedAnimation(
-                    parent: _headerAnimationController,
-                    curve: Curves.easeOutBack,
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              children: [
+                // Custom Animated Header
+                SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0, -1),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(
+                      parent: _headerAnimationController,
+                      curve: Curves.easeOutBack,
+                    ),
                   ),
+                  child: _buildModernHeader(isMobile),
                 ),
-                child: _buildModernHeader(isMobile),
-              ),
-
-              // Search and Filter Bar
-              _buildSearchAndFilterBar(isMobile),
-
-              // Content Area
-              Expanded(
-                child: StreamBuilder<QuerySnapshot>(
+            
+                // Search and Filter Bar
+                _buildSearchAndFilterBar(isMobile),
+            
+                // Content Area
+                StreamBuilder<QuerySnapshot>(
                   stream: bookingsRef.snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       return _buildErrorState();
                     }
-
+                
                     if (!snapshot.hasData) {
                       return _buildLoadingState();
                     }
-
+                
                     final docs = snapshot.data!.docs;
                     _allBookings = docs;
-
+                
                     final filteredDocs = _filterBookings(docs);
-
+                
                     if (filteredDocs.isEmpty) {
                       return _buildEmptyState();
                     }
-
+                
                     return _buildBookingsList(filteredDocs, isMobile, isTablet);
                   },
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -414,6 +415,8 @@ class _AdminBookingDashboardScreenState
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             padding: const EdgeInsets.all(20),
@@ -494,56 +497,58 @@ class _AdminBookingDashboardScreenState
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.all(32),
-        padding: const EdgeInsets.all(32),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              blurRadius: 10,
-              spreadRadius: 2,
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blue.shade100, Colors.indigo.shade100],
+    return SingleChildScrollView(
+      child: Center(
+        child: Container(
+          margin: const EdgeInsets.all(32),
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                blurRadius: 10,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.blue.shade100, Colors.indigo.shade100],
+                  ),
+                  shape: BoxShape.circle,
                 ),
-                shape: BoxShape.circle,
+                child: const Icon(
+                  Icons.event_seat,
+                  size: 48,
+                  color: Colors.indigo,
+                ),
               ),
-              child: const Icon(
-                Icons.event_seat,
-                size: 48,
-                color: Colors.indigo,
+              const SizedBox(height: 16),
+              const Text(
+                'No Bookings Found',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.indigo,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'No Bookings Found',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.indigo,
+              const SizedBox(height: 8),
+              Text(
+                _searchQuery.isEmpty
+                    ? 'No bookings available yet'
+                    : 'Try adjusting your search or filters',
+                style: const TextStyle(color: Colors.grey),
+                textAlign: TextAlign.center,
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _searchQuery.isEmpty
-                  ? 'No bookings available yet'
-                  : 'Try adjusting your search or filters',
-              style: const TextStyle(color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -642,15 +647,15 @@ class _AdminBookingDashboardScreenState
                   : Row(
                     children: [
                       Expanded(
-                        flex: 2,
+                   
                         child: _buildEventNameSection(eventName),
                       ),
-                      const SizedBox(width: 16),
+               
                       Expanded(
-                        flex: 2,
+                  
                         child: _buildUserInfoSection(email, userId),
                       ),
-                      const SizedBox(width: 16),
+                   
                       Expanded(
                         child: _buildAmountAndDateSection(amount, timestamp),
                       ),
@@ -751,9 +756,12 @@ class _AdminBookingDashboardScreenState
     );
   }
 
+
+
   Widget _buildAmountAndDateSection(double amount, DateTime? timestamp) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+   
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -799,6 +807,8 @@ class _AdminBookingDashboardScreenState
       ],
     );
   }
+
+
 
   Widget _buildExportFAB() {
     return Container(

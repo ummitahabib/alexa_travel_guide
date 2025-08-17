@@ -13,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
 
 @RoutePage()
+
 class AdminGalleryScreen extends StatefulWidget {
   const AdminGalleryScreen({super.key});
 
@@ -31,6 +32,9 @@ class _AdminGalleryScreenState extends State<AdminGalleryScreen>
   bool _isLoading = true;
   String _searchQuery = '';
   String _selectedCategory = 'All';
+  String? _selectedImageUrl; // ✅ store uploaded image url
+  bool _isImageUploading = false; // ✅ separate state for image upload button
+
 
   late AnimationController _fadeController;
   late AnimationController _scaleController;
@@ -107,6 +111,59 @@ class _AdminGalleryScreenState extends State<AdminGalleryScreen>
     }
   }
 
+
+   Future<void> _pickImage() async {
+    setState(() => _isImageUploading = true);
+    final imageUrl = await _pickAndUploadImage();
+    if (imageUrl != null) {
+      setState(() {
+        _selectedImageUrl = imageUrl; // ✅ save url for preview + submit
+      });
+    }
+    setState(() => _isImageUploading = false);
+  }
+
+
+    Future<void> _submitGallery() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    if (_selectedImageUrl == null) {
+      _showErrorSnackBar('Please select an image first');
+      return;
+    }
+
+    setState(() => _isUploading = true);
+
+    try {
+      final newImg = GalleryImage(
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+        imageUrl: _selectedImageUrl!, // ✅ use saved url
+        category: _selectedCategory == 'All' ? 'Adventures' : _selectedCategory,
+        createdAt: Timestamp.now(),
+      );
+
+      final docRef = await FirebaseFirestore.instance
+          .collection('gallery')
+          .add(newImg.toJson());
+
+      setState(() {
+        gallery.insert(0, newImg.copyWith(id: docRef.id));
+        _titleController.clear();
+        _descriptionController.clear();
+        _selectedImageUrl = null; // ✅ reset after submit
+        _isUploading = false;
+      });
+
+      _showSuccessSnackBar('Image added successfully!');
+      Navigator.pop(context);
+    } catch (e) {
+      setState(() => _isUploading = false);
+      _showErrorSnackBar('Failed to add image: $e');
+    }
+  }
+
+
   Future<String?> _pickAndUploadImage() async {
     try {
       if (kIsWeb) {
@@ -157,6 +214,8 @@ class _AdminGalleryScreenState extends State<AdminGalleryScreen>
   }
 
   Future<void> _addImage() async {
+
+    //this method shpuld be able to upload an image and we will use the link in the submit method.
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isUploading = true);
@@ -168,24 +227,6 @@ class _AdminGalleryScreenState extends State<AdminGalleryScreen>
     }
 
     try {
-      final newImg = GalleryImage(
-        title: _titleController.text.trim(),
-        description: _descriptionController.text.trim(),
-        imageUrl: imageUrl,
-        category: _selectedCategory == 'All' ? 'Adventures' : _selectedCategory,
-        createdAt: Timestamp.now(),
-      );
-
-      final docRef = await FirebaseFirestore.instance
-          .collection('gallery')
-          .add(newImg.toJson());
-
-      setState(() {
-        gallery.insert(0, newImg.copyWith(id: docRef.id));
-        _titleController.clear();
-        _descriptionController.clear();
-        _isUploading = false;
-      });
 
       _showSuccessSnackBar('Image added successfully!');
       Navigator.pop(context);
@@ -194,6 +235,8 @@ class _AdminGalleryScreenState extends State<AdminGalleryScreen>
       _showErrorSnackBar('Failed to add image: $e');
     }
   }
+
+
 
   Future<void> _deleteImage(GalleryImage image) async {
     try {
@@ -396,7 +439,42 @@ class _AdminGalleryScreenState extends State<AdminGalleryScreen>
                     ),
                     const SizedBox(height: 32),
 
-                    // Action Buttons
+
+         if (_selectedImageUrl != null) ...[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.network(
+                      _selectedImageUrl!,
+                      height: 150,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                ElevatedButton.icon(
+                  onPressed: _isImageUploading ? null : _pickImage,
+                  icon: _isImageUploading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(Icons.image, color: Colors.white),
+                  label: Text(
+                    _isImageUploading ? 'Uploading...' : 'Choose Image',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF667eea),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
                     Row(
                       children: [
                         Expanded(
@@ -415,6 +493,8 @@ class _AdminGalleryScreenState extends State<AdminGalleryScreen>
                           ),
                         ),
                         const SizedBox(width: 16),
+                     
+                     
                         Expanded(
                           flex: 2,
                           child: Container(
@@ -425,9 +505,9 @@ class _AdminGalleryScreenState extends State<AdminGalleryScreen>
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: ElevatedButton.icon(
-                              onPressed: _isUploading ? null : _addImage,
+                              onPressed: _isLoading ? null : _submitGallery,
                               icon:
-                                  _isUploading
+                                  _isLoading
                                       ? const SizedBox(
                                         width: 20,
                                         height: 20,
@@ -441,7 +521,7 @@ class _AdminGalleryScreenState extends State<AdminGalleryScreen>
                                         color: Colors.white,
                                       ),
                               label: Text(
-                                _isUploading ? 'Uploading...' : 'Add Image',
+                                _isUploading ? 'Creating gallery' : 'Submit',
                                 style: const TextStyle(color: Colors.white),
                               ),
                               style: ElevatedButton.styleFrom(
@@ -457,6 +537,8 @@ class _AdminGalleryScreenState extends State<AdminGalleryScreen>
                             ),
                           ),
                         ),
+                  
+                  
                       ],
                     ),
                   ],

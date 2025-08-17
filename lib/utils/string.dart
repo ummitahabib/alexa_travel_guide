@@ -11,4 +11,5 @@ class RouteString {
   static const String adminDashboard = '/admin-dashboard';
   static const String manageEvent = '/manage-event';
   static const String adminBookingDashboard = '/admin-booking';
+  static const String adminTestimonial = '/admin-testimonial';
 }

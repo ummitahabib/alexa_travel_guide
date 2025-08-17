@@ -7,4 +7,8 @@ final eventRepositoryProvider = Provider((ref) => EventRepository());
 final upcomingEventsProvider = FutureProvider<List<Event>>((ref) async {
   final repo = ref.watch(eventRepositoryProvider);
   return await repo.fetchEvents();
+
 });
+
+
+
