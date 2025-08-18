@@ -18,6 +18,9 @@ void main() async {
       storageBucket: "shetravels-ac34a.firebasestorage.app",
     ),
   );
+
+
+
   runApp(const ProviderScope(child: SheTravelApp()));
 }
 

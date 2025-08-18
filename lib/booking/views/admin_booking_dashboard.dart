@@ -61,7 +61,8 @@ class _AdminBookingDashboardScreenState
         .orderBy('timestamp', descending: true);
 
     return Scaffold(
-      body: Container(
+      body: 
+      Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -77,7 +78,6 @@ class _AdminBookingDashboardScreenState
         child: SafeArea(
           child: Column(
             children: [
-              // Custom Animated Header
               SlideTransition(
                 position: Tween<Offset>(
                   begin: const Offset(0, -1),
@@ -94,29 +94,31 @@ class _AdminBookingDashboardScreenState
               // Search and Filter Bar
               _buildSearchAndFilterBar(isMobile),
           
-              // Content Area
-              StreamBuilder<QuerySnapshot>(
-                stream: bookingsRef.snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return _buildErrorState();
-                  }
-              
-                  if (!snapshot.hasData) {
-                    return _buildLoadingState();
-                  }
-              
-                  final docs = snapshot.data!.docs;
-                  _allBookings = docs;
-              
-                  final filteredDocs = _filterBookings(docs);
-              
-                  if (filteredDocs.isEmpty) {
-                    return _buildEmptyState();
-                  }
-              
-                  return _buildBookingsList(filteredDocs, isMobile, isTablet);
-                },
+              // Content Area - FIXED: Added Expanded wrapper
+              Expanded(
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: bookingsRef.snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return _buildErrorState();
+                    }
+          
+                    if (!snapshot.hasData) {
+                      return _buildLoadingState();
+                    }
+          
+                    final docs = snapshot.data!.docs;
+                    _allBookings = docs;
+          
+                    final filteredDocs = _filterBookings(docs);
+          
+                    if (filteredDocs.isEmpty) {
+                      return _buildEmptyState();
+                    }
+          
+                    return _buildBookingsList(filteredDocs, isMobile, isTablet);
+                  },
+                ),
               ),
             ],
           ),
@@ -375,33 +377,36 @@ class _AdminBookingDashboardScreenState
   Widget _buildFilterChips() {
     final filters = ['All', 'Today', 'This Week', 'This Month'];
 
-    return Row(
-      children:
-          filters.map((filter) {
-            final isSelected = _selectedFilter == filter;
-            return Container(
-              margin: const EdgeInsets.only(right: 8),
-              child: FilterChip(
-                label: Text(filter),
-                selected: isSelected,
-                onSelected: (selected) {
-                  setState(() {
-                    _selectedFilter = filter;
-                  });
-                },
-                backgroundColor: Colors.grey.shade100,
-                selectedColor: Colors.indigo.shade100,
-                labelStyle: TextStyle(
-                  color:
-                      isSelected
-                          ? Colors.indigo.shade700
-                          : Colors.grey.shade700,
-                  fontWeight:
-                      isSelected ? FontWeight.bold : FontWeight.normal,
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children:
+            filters.map((filter) {
+              final isSelected = _selectedFilter == filter;
+              return Container(
+                margin: const EdgeInsets.only(right: 8),
+                child: FilterChip(
+                  label: Text(filter),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedFilter = filter;
+                    });
+                  },
+                  backgroundColor: Colors.grey.shade100,
+                  selectedColor: Colors.indigo.shade100,
+                  labelStyle: TextStyle(
+                    color:
+                        isSelected
+                            ? Colors.indigo.shade700
+                            : Colors.grey.shade700,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
                 ),
-              ),
-            );
-          }).toList(),
+              );
+            }).toList(),
+      ),
     );
   }
 
@@ -493,8 +498,8 @@ class _AdminBookingDashboardScreenState
   Widget _buildEmptyState() {
     return Center(
       child: Container(
-        margin: const EdgeInsets.all(32),
-        padding: const EdgeInsets.all(32),
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -519,7 +524,7 @@ class _AdminBookingDashboardScreenState
               ),
               child: const Icon(
                 Icons.event_seat,
-                size: 48,
+                size: 20,
                 color: Colors.indigo,
               ),
             ),
@@ -567,11 +572,12 @@ class _AdminBookingDashboardScreenState
 
   Widget _buildGridView(List<QueryDocumentSnapshot> docs) {
     return GridView.builder(
+      shrinkWrap: true,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
-        childAspectRatio: 1.3,
+        childAspectRatio: 1.2,
       ),
       itemCount: docs.length,
       itemBuilder: (context, index) {
@@ -582,6 +588,7 @@ class _AdminBookingDashboardScreenState
 
   Widget _buildListView(List<QueryDocumentSnapshot> docs, bool isMobile) {
     return ListView.builder(
+      shrinkWrap: true,
       itemCount: docs.length,
       itemBuilder: (context, index) {
         return _buildBookingCard(docs[index], index, isMobile);
@@ -636,22 +643,26 @@ class _AdminBookingDashboardScreenState
                       _buildAmountAndDateSection(amount, timestamp),
                     ],
                   )
-                  : Row(
-                    children: [
-                      Expanded(
-                   
-                        child: _buildEventNameSection(eventName),
-                      ),
-               
-                      Expanded(
-                  
-                        child: _buildUserInfoSection(email, userId),
-                      ),
-                   
-                      Expanded(
-                        child: _buildAmountAndDateSection(amount, timestamp),
-                      ),
-                    ],
+                  : IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: _buildEventNameSection(eventName),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          flex: 2,
+                          child: _buildUserInfoSection(email, userId),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          flex: 2,
+                          child: _buildAmountAndDateSection(amount, timestamp),
+                        ),
+                      ],
+                    ),
                   ),
         ),
       ),
@@ -678,15 +689,17 @@ class _AdminBookingDashboardScreenState
           ),
         ),
         const SizedBox(height: 6),
-        Text(
-          eventName,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.indigo,
+        Flexible(
+          child: Text(
+            eventName,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.indigo,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
@@ -712,48 +725,49 @@ class _AdminBookingDashboardScreenState
           ),
         ),
         const SizedBox(height: 6),
-        Row(
-          children: [
-            const Icon(Icons.person, size: 16, color: Colors.grey),
-            const SizedBox(width: 4),
-            Expanded(
-              child: Text(
-                email,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+        Flexible(
+          child: Row(
+            children: [
+              const Icon(Icons.person, size: 16, color: Colors.grey),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  email,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         const SizedBox(height: 4),
-        Row(
-          children: [
-            const Icon(Icons.badge, size: 16, color: Colors.grey),
-            const SizedBox(width: 4),
-            Expanded(
-              child: Text(
-                "ID: ${userId.substring(0, userId.length > 8 ? 8 : userId.length)}...",
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+        Flexible(
+          child: Row(
+            children: [
+              const Icon(Icons.badge, size: 16, color: Colors.grey),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  "ID: ${userId.substring(0, userId.length > 8 ? 8 : userId.length)}...",
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
   }
 
-
-
   Widget _buildAmountAndDateSection(double amount, DateTime? timestamp) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-   
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -774,33 +788,43 @@ class _AdminBookingDashboardScreenState
         ),
         const SizedBox(height: 8),
         if (timestamp != null) ...[
-          Row(
-            children: [
-              const Icon(Icons.access_time, size: 16, color: Colors.grey),
-              const SizedBox(width: 4),
-              Text(
-                DateFormat('MMM dd, yyyy').format(timestamp),
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-              ),
-            ],
+          Flexible(
+            child: Row(
+              children: [
+                const Icon(Icons.access_time, size: 16, color: Colors.grey),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    DateFormat('MMM dd, yyyy').format(timestamp),
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 2),
-          Row(
-            children: [
-              const Icon(Icons.schedule, size: 16, color: Colors.grey),
-              const SizedBox(width: 4),
-              Text(
-                DateFormat('HH:mm').format(timestamp),
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-              ),
-            ],
+          Flexible(
+            child: Row(
+              children: [
+                const Icon(Icons.schedule, size: 16, color: Colors.grey),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    DateFormat('HH:mm').format(timestamp),
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ],
     );
   }
-
-
 
   Widget _buildExportFAB() {
     return Container(
